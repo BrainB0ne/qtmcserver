@@ -1,0 +1,12 @@
+<RCC>
+    <qresource prefix="/">
+        <file>images/qtmcserver-16x16.png</file>
+        <file>images/qtmcserver-256x256.png</file>
+        <file>gpl-3.0.txt</file>
+        <file>images/start.png</file>
+        <file>images/stop.png</file>
+        <file>images/exit.png</file>
+        <file>images/settings.png</file>
+        <file>images/about.png</file>
+    </qresource>
+</RCC>
