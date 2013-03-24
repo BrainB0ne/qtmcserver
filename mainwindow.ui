@@ -56,6 +56,11 @@
        <attribute name="title">
         <string>Server Properties</string>
        </attribute>
+       <layout class="QGridLayout" name="gridLayout_3">
+        <item row="0" column="0">
+         <widget class="QTextEdit" name="serverPropertiesTextEdit"/>
+        </item>
+       </layout>
       </widget>
      </widget>
     </item>

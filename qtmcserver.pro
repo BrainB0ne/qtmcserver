@@ -55,15 +55,21 @@ RC_FILE = qtmcserver.rc
 SOURCES += main.cpp\
         mainwindow.cpp \
     licensedialog.cpp \
-    aboutdialog.cpp
+    aboutdialog.cpp \
+    settingsdialog.cpp \
+    downloaddialog.cpp
 
 HEADERS  += mainwindow.h \
     licensedialog.h \
-    aboutdialog.h
+    aboutdialog.h \
+    settingsdialog.h \
+    downloaddialog.h
 
 FORMS    += mainwindow.ui \
     licensedialog.ui \
-    aboutdialog.ui
+    aboutdialog.ui \
+    settingsdialog.ui \
+    downloaddialog.ui
 
 RESOURCES += \
     qtmcserver.qrc
@@ -77,4 +83,5 @@ OTHER_FILES += \
     images/qtmcserver-16x16.png \
     images/qtmcserver.ico \
     images/exit.png \
-    images/about.png
+    images/about.png \
+    images/download.png

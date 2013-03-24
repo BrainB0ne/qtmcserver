@@ -21,7 +21,7 @@
    <item row="0" column="0">
     <widget class="QPushButton" name="downloadButton">
      <property name="text">
-      <string>&amp;Download Minecraft Server</string>
+      <string>&amp;Download</string>
      </property>
     </widget>
    </item>

@@ -19,6 +19,7 @@
 #include "ui_mainwindow.h"
 
 #include "aboutdialog.h"
+#include "settingsdialog.h"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -159,7 +160,15 @@ void MainWindow::on_actionExit_triggered()
 
 void MainWindow::on_actionSettings_triggered()
 {
+    SettingsDialog* settingsDlg = new SettingsDialog(this);
 
+    if(settingsDlg)
+    {
+        settingsDlg->exec();
+
+        delete settingsDlg;
+        settingsDlg = 0;
+    }
 }
 
 void MainWindow::on_actionStart_triggered()

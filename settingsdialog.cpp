@@ -21,7 +21,15 @@ void SettingsDialog::on_downloadButton_clicked()
 
     if(downloadDlg)
     {
-        downloadDlg->exec();
+        if(downloadDlg->exec() == QDialog::Accepted)
+        {
+            QString saveLocation = downloadDlg->getSaveLocation();
+
+            if(!saveLocation.isEmpty())
+            {
+                ui->mcServerFileLineEdit->setText(saveLocation);
+            }
+        }
 
         delete downloadDlg;
         downloadDlg = 0;

@@ -6,6 +6,8 @@ DownloadDialog::DownloadDialog(QWidget *parent) :
     ui(new Ui::DownloadDialog)
 {
     ui->setupUi(this);
+
+    m_saveLocation = "";
 }
 
 DownloadDialog::~DownloadDialog()
@@ -16,4 +18,16 @@ DownloadDialog::~DownloadDialog()
 void DownloadDialog::on_downloadButton_clicked()
 {
 
+}
+
+void DownloadDialog::on_buttonBox_accepted()
+{
+    m_saveLocation = ui->saveLineEdit->text();
+
+    accept();
+}
+
+void DownloadDialog::on_buttonBox_rejected()
+{
+    reject();
 }

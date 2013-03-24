@@ -65,6 +65,10 @@
      <property name="text">
       <string>&amp;Download Minecraft Server ...</string>
      </property>
+     <property name="icon">
+      <iconset resource="qtmcserver.qrc">
+       <normaloff>:/images/download.png</normaloff>:/images/download.png</iconset>
+     </property>
     </widget>
    </item>
    <item row="2" column="0">
@@ -98,7 +102,7 @@
      <property name="sizeHint" stdset="0">
       <size>
        <width>20</width>
-       <height>85</height>
+       <height>84</height>
       </size>
      </property>
     </spacer>
