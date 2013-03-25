@@ -48,8 +48,8 @@ public:
 
     QString getSaveLocation() {return m_saveLocation;}
 
-    void doDownload(const QUrl &url);
-    QString saveFileName(const QUrl &url);
+    void doDownload(const QUrl& url);
+    QString saveFileName(const QUrl& url, const QString& path);
 
 public slots:
     void startDownload();

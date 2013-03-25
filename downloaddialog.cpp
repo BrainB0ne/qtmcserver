@@ -18,7 +18,11 @@
 #include "downloaddialog.h"
 #include "ui_downloaddialog.h"
 
-#define MCSERVER_URL "https://s3.amazonaws.com/MinecraftDownload/launcher/minecraft_server.jar"
+#include <QProcess>
+#include <QFileDialog>
+#include <QMessageBox>
+
+#define MCSERVER_URL "http://s3.amazonaws.com/MinecraftDownload/launcher/minecraft_server.jar"
 
 DownloadDialog::DownloadDialog(QWidget *parent) :
     QDialog(parent),
@@ -51,27 +55,77 @@ void DownloadDialog::on_buttonBox_rejected()
     reject();
 }
 
-void DownloadDialog::doDownload(const QUrl &url)
+void DownloadDialog::doDownload(const QUrl& url)
 {
-    QString strUrl = url.toString();
+    QString dir = QFileDialog::getExistingDirectory(this, tr("Select Download Folder"),
+                                                    "/home",
+                                                    QFileDialog::ShowDirsOnly
+                                                    | QFileDialog::DontResolveSymlinks);
+    if(!dir.isEmpty())
+    {
+        QApplication::setOverrideCursor(Qt::WaitCursor);
+
+        ui->downloadLogTextEdit->clear();
+        ui->saveLineEdit->clear();
+
+        QString saveLocation = saveFileName(url, dir);
+        QString program = "./wget";
+        QStringList arguments;
+        arguments << "-O" << saveLocation << MCSERVER_URL;
+
+        ui->downloadLogTextEdit->append(tr("Connecting to %1\n").arg(MCSERVER_URL));
+        ui->downloadLogTextEdit->append(tr("Downloading Minecraft Server... Please wait...\n"));
+
+        ui->downloadLogTextEdit->update();
+
+        QProcess p;
+        p.start(program, arguments);
+        p.waitForFinished(-1);
+
+        QString p_stdout = p.readAllStandardOutput();
+        QString p_stderr = p.readAllStandardError();
+
+        if(!p_stdout.isEmpty())
+        {
+            ui->downloadLogTextEdit->append(p_stdout);
+        }
+
+        if(!p_stderr.isEmpty())
+        {
+            ui->downloadLogTextEdit->append("\n");
+            ui->downloadLogTextEdit->append(p_stderr);
+        }
+
+        QApplication::restoreOverrideCursor();
+
+        if(p.exitStatus() == QProcess::NormalExit)
+        {
+            ui->saveLineEdit->setText(QDir::toNativeSeparators(saveLocation));
+        }
+        else
+        {
+            QMessageBox::warning(this, tr("Error"), tr("Failed to download Minecraft Server!"));
+        }
+    }
 }
 
-QString DownloadDialog::saveFileName(const QUrl &url)
+QString DownloadDialog::saveFileName(const QUrl& url, const QString& path)
 {
-    QString path = url.path();
-    QString basename = QFileInfo(path).fileName();
+    QString urlpath = url.path();
+    QString basename = QFileInfo(urlpath).fileName();
 
     if (basename.isEmpty())
     {
-        basename = "minecraft_server";
+        basename = "minecraft_server.jar";
     }
 
-    if (QFile::exists(basename))
+    if (QFile::exists(path + QString("/") + basename))
     {
         // already exists, don't overwrite
         int i = 0;
+        basename = basename.remove(".jar");
         basename += '.';
-        while (QFile::exists(basename + QString::number(i) + QString(".jar")))
+        while (QFile::exists(path + QString("/") + basename + QString::number(i) + QString(".jar")))
         {
             ++i;
         }
@@ -80,7 +134,7 @@ QString DownloadDialog::saveFileName(const QUrl &url)
         basename += QString(".jar");
     }
 
-    return basename;
+    return path + QString("/") + basename;
 }
 
 void DownloadDialog::startDownload()
