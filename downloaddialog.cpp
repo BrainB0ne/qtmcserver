@@ -31,6 +31,9 @@ DownloadDialog::DownloadDialog(QWidget *parent) :
     ui->setupUi(this);
 
     m_saveLocation = "";
+    m_downloadPath = "";
+
+    connect(&manager, SIGNAL(finished(QNetworkReply*)), SLOT(downloadFinished(QNetworkReply*)));
 }
 
 DownloadDialog::~DownloadDialog()
@@ -40,7 +43,22 @@ DownloadDialog::~DownloadDialog()
 
 void DownloadDialog::on_downloadButton_clicked()
 {
-    startDownload();
+    QString dir = QFileDialog::getExistingDirectory(this, tr("Select Download Folder"),
+                                                    "/home",
+                                                    QFileDialog::ShowDirsOnly
+                                                    | QFileDialog::DontResolveSymlinks);
+    if(!dir.isEmpty())
+    {
+        ui->downloadLogTextEdit->clear();
+        ui->saveLineEdit->clear();
+
+        m_downloadPath = dir;
+        startDownload();
+    }
+    else
+    {
+        m_downloadPath = "";
+    }
 }
 
 void DownloadDialog::on_buttonBox_accepted()
@@ -55,58 +73,22 @@ void DownloadDialog::on_buttonBox_rejected()
     reject();
 }
 
+void DownloadDialog::startDownload()
+{
+    QApplication::setOverrideCursor(Qt::WaitCursor);
+
+    ui->downloadLogTextEdit->append(tr("Connecting to %1\n").arg(MCSERVER_URL));
+    ui->downloadLogTextEdit->append(tr("Downloading Minecraft Server... Please wait...\n"));
+
+    doDownload( QUrl(MCSERVER_URL) );
+}
+
 void DownloadDialog::doDownload(const QUrl& url)
 {
-    QString dir = QFileDialog::getExistingDirectory(this, tr("Select Download Folder"),
-                                                    "/home",
-                                                    QFileDialog::ShowDirsOnly
-                                                    | QFileDialog::DontResolveSymlinks);
-    if(!dir.isEmpty())
-    {
-        QApplication::setOverrideCursor(Qt::WaitCursor);
+    QNetworkRequest request(url);
+    QNetworkReply *reply = manager.get(request);
 
-        ui->downloadLogTextEdit->clear();
-        ui->saveLineEdit->clear();
-
-        QString saveLocation = saveFileName(url, dir);
-        QString program = "./wget";
-        QStringList arguments;
-        arguments << "-O" << saveLocation << MCSERVER_URL;
-
-        ui->downloadLogTextEdit->append(tr("Connecting to %1\n").arg(MCSERVER_URL));
-        ui->downloadLogTextEdit->append(tr("Downloading Minecraft Server... Please wait...\n"));
-
-        ui->downloadLogTextEdit->update();
-
-        QProcess p;
-        p.start(program, arguments);
-        p.waitForFinished(-1);
-
-        QString p_stdout = p.readAllStandardOutput();
-        QString p_stderr = p.readAllStandardError();
-
-        if(!p_stdout.isEmpty())
-        {
-            ui->downloadLogTextEdit->append(p_stdout);
-        }
-
-        if(!p_stderr.isEmpty())
-        {
-            ui->downloadLogTextEdit->append("\n");
-            ui->downloadLogTextEdit->append(p_stderr);
-        }
-
-        QApplication::restoreOverrideCursor();
-
-        if(p.exitStatus() == QProcess::NormalExit)
-        {
-            ui->saveLineEdit->setText(QDir::toNativeSeparators(saveLocation));
-        }
-        else
-        {
-            QMessageBox::warning(this, tr("Error"), tr("Failed to download Minecraft Server!"));
-        }
-    }
+    currentDownloads.append(reply);
 }
 
 QString DownloadDialog::saveFileName(const QUrl& url, const QString& path)
@@ -137,8 +119,48 @@ QString DownloadDialog::saveFileName(const QUrl& url, const QString& path)
     return path + QString("/") + basename;
 }
 
-void DownloadDialog::startDownload()
+bool DownloadDialog::saveToDisk(const QString &filename, QIODevice *data)
 {
-    QUrl url = QUrl(MCSERVER_URL);
-    doDownload(url);
+    QFile file(filename);
+    if (!file.open(QIODevice::WriteOnly))
+    {
+        ui->downloadLogTextEdit->append(tr("<font color=\"red\">Could not open %1 for writing: %2</font>\n")
+                                        .arg(QDir::toNativeSeparators(filename))
+                                        .arg(file.errorString()));
+        return false;
+    }
+
+    file.write(data->readAll());
+    file.close();
+
+    ui->saveLineEdit->setText(QDir::toNativeSeparators(filename));
+
+    return true;
+}
+
+void DownloadDialog::downloadFinished(QNetworkReply *reply)
+{
+    QUrl url = reply->url();
+
+    if (reply->error())
+    {
+        ui->downloadLogTextEdit->append(tr("<font color=\"red\">Download of %1 failed: %2</font>\n")
+                                        .arg(url.toEncoded().constData())
+                                        .arg(reply->errorString()));
+    }
+    else
+    {
+        QString filename = saveFileName(url, m_downloadPath);
+        if (saveToDisk(filename, reply))
+        {
+            ui->downloadLogTextEdit->append(tr("Download of %1 succeeded (saved to %2)\n")
+                                            .arg(url.toEncoded().constData())
+                                            .arg(QDir::toNativeSeparators(filename)));
+        }
+    }
+
+    currentDownloads.removeAll(reply);
+    reply->deleteLater();
+
+    QApplication::restoreOverrideCursor();
 }

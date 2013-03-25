@@ -27,6 +27,9 @@
 #include <QStringList>
 #include <QTimer>
 #include <QUrl>
+#include <QNetworkAccessManager>
+#include <QNetworkRequest>
+#include <QNetworkReply>
 
 #include <stdio.h>
 
@@ -50,9 +53,11 @@ public:
 
     void doDownload(const QUrl& url);
     QString saveFileName(const QUrl& url, const QString& path);
+    bool saveToDisk(const QString &filename, QIODevice *data);
 
 public slots:
     void startDownload();
+    void downloadFinished(QNetworkReply *reply);
 
 private slots:
     void on_downloadButton_clicked();
@@ -63,6 +68,9 @@ private:
     Ui::DownloadDialog *ui;
 
     QString m_saveLocation;
+    QString m_downloadPath;
+    QNetworkAccessManager manager;
+    QList<QNetworkReply *> currentDownloads;
 };
 
 #endif // DOWNLOADDIALOG_H
