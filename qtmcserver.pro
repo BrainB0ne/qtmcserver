@@ -49,6 +49,12 @@ debug {
 }
 
 win32 {
+QMAKE_POST_LINK += xcopy /Y .\deps\wget.exe $${OUTPUT_DIR} && \
+                   xcopy /Y .\deps\libeay32.dll $${OUTPUT_DIR} && \
+                   xcopy /Y .\deps\libiconv2.dll $${OUTPUT_DIR} && \
+                   xcopy /Y .\deps\libintl3.dll $${OUTPUT_DIR} && \
+                   xcopy /Y .\deps\libssl32.dll $${OUTPUT_DIR}
+
 RC_FILE = qtmcserver.rc
 }
 
