@@ -27,16 +27,6 @@ LicenseDialog::LicenseDialog(QWidget *parent) :
     ui(new Ui::LicenseDialog)
 {
     ui->setupUi(this);
-
-    QFile file("://gpl-3.0.txt");
-    if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
-        return;
-
-    QTextStream in(&file);
-    while (!in.atEnd())
-    {
-        ui->licenseTextEdit->append(in.readLine());
-    }
 }
 
 LicenseDialog::~LicenseDialog()
@@ -47,4 +37,17 @@ LicenseDialog::~LicenseDialog()
 void LicenseDialog::initialize()
 {
     ui->licenseTextEdit->verticalScrollBar()->setValue(0);
+}
+
+void LicenseDialog::fillLicenseTextEdit()
+{
+    QFile file("://gpl-3.0.txt");
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
+        return;
+
+    QTextStream in(&file);
+    while (!in.atEnd())
+    {
+        ui->licenseTextEdit->append(in.readLine());
+    }
 }

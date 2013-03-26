@@ -63,6 +63,11 @@ void AboutDialog::slotLicenseButtonClicked()
     if(!m_pLicenseDlg)
     {
         m_pLicenseDlg = new LicenseDialog(this);
+
+        if(m_pLicenseDlg)
+        {
+            m_pLicenseDlg->fillLicenseTextEdit();
+        }
     }
 
     m_pLicenseDlg->show();

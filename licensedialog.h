@@ -33,6 +33,7 @@ public:
     ~LicenseDialog();
 
     void initialize();
+    void fillLicenseTextEdit();
     
 private:
     Ui::LicenseDialog *ui;
