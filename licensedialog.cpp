@@ -28,7 +28,7 @@ LicenseDialog::LicenseDialog(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    QFile file(":/gpl-3.0.txt");
+    QFile file("://gpl-3.0.txt");
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
         return;
 
