@@ -18,7 +18,6 @@
 #include "downloaddialog.h"
 #include "ui_downloaddialog.h"
 
-#include <QProcess>
 #include <QFileDialog>
 #include <QMessageBox>
 
