@@ -146,6 +146,7 @@ void MainWindow::on_actionAbout_triggered()
 
     if(aboutDlg)
     {
+        aboutDlg->initialize();
         aboutDlg->exec();
 
         delete aboutDlg;

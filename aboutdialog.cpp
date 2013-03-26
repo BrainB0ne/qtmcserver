@@ -30,19 +30,30 @@ AboutDialog::AboutDialog(QWidget *parent) :
     ui->setupUi(this);
 
     m_pLicenseDlg = 0;
-
-    ui->copyLeftLabel->setText(tr("Copyleft") + QString(" %1").arg(COPYLEFT_YEAR));
-    ui->buildDateLabel->setText(tr("Build Date") + QString(": %1 - %2").arg(__DATE__).arg(__TIME__));
-    ui->versionLabel->setText(tr("Version") + QString(": %1").arg(VERSION_NUMBER));
-
-    connect(ui->licenseButton, SIGNAL(clicked()), this, SLOT(slotLicenseButtonClicked()));
 }
 
 AboutDialog::~AboutDialog()
 {
-    if(m_pLicenseDlg) delete m_pLicenseDlg;
+    if(m_pLicenseDlg)
+    {
+        delete m_pLicenseDlg;
+    }
 
     delete ui;
+}
+
+void AboutDialog::connectSignalsSlots()
+{
+    connect(ui->licenseButton, SIGNAL(clicked()), this, SLOT(slotLicenseButtonClicked()));
+}
+
+void AboutDialog::initialize()
+{
+    connectSignalsSlots();
+
+    ui->copyLeftLabel->setText(tr("Copyleft") + QString(" %1").arg(COPYLEFT_YEAR));
+    ui->buildDateLabel->setText(tr("Build Date") + QString(": %1 - %2").arg(__DATE__).arg(__TIME__));
+    ui->versionLabel->setText(tr("Version") + QString(": %1").arg(VERSION_NUMBER));
 }
 
 void AboutDialog::slotLicenseButtonClicked()

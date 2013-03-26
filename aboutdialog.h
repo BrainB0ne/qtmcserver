@@ -33,6 +33,9 @@ class AboutDialog : public QDialog
 public:
     explicit AboutDialog(QWidget *parent = 0);
     ~AboutDialog();
+
+    void initialize();
+    void connectSignalsSlots();
     
 private slots:
     void slotLicenseButtonClicked();
