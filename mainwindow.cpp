@@ -37,6 +37,8 @@ MainWindow::MainWindow(QWidget *parent) :
     stopServerAction = 0;
     trayIcon = 0;
     trayIconMenu = 0;
+
+    m_pServerProcess = 0;
 }
 
 MainWindow::~MainWindow()
@@ -45,10 +47,13 @@ MainWindow::~MainWindow()
 }
 
 void MainWindow::initialize()
-{
+{    
     createActions();
     createTrayIcon();
     setIcon();
+
+    ui->actionStart->setEnabled(true);
+    ui->actionStop->setEnabled(false);
 
     if(trayIcon)
     {
@@ -174,10 +179,103 @@ void MainWindow::on_actionSettings_triggered()
 
 void MainWindow::on_actionStart_triggered()
 {
+    if(!m_pServerProcess)
+    {
+        m_pServerProcess = new QProcess(this);
 
+        connect( m_pServerProcess, SIGNAL(started()), SLOT(onStart()) );
+        connect( m_pServerProcess, SIGNAL(finished(int,QProcess::ExitStatus)), SLOT(onFinish(int,QProcess::ExitStatus)) );
+        connect( m_pServerProcess, SIGNAL(readyReadStandardOutput()), SLOT(onStandardOutput()) );
+        connect( m_pServerProcess, SIGNAL(readyReadStandardError()), SLOT(onStandardError()) );
+
+        if(m_pServerProcess)
+        {
+            QStringList arguments;
+            arguments << "-Xms1024M" << "-Xmx1024M" << "-jar" << "minecraft_server.jar" << "nogui";
+
+            m_pServerProcess->start("java", arguments, QIODevice::ReadWrite | QIODevice::Unbuffered);
+            m_pServerProcess->waitForStarted();
+        }
+    }
+}
+
+void MainWindow::onStart()
+{
+    ui->serverLogTextEdit->append(tr("Starting Minecraft Server..."));
+
+    ui->actionStart->setEnabled(false);
+    ui->actionStop->setEnabled(true);
+}
+
+void MainWindow::onFinish(int exitCode, QProcess::ExitStatus exitStatus)
+{
+    if(exitStatus == QProcess::NormalExit)
+    {
+        ui->serverLogTextEdit->append(tr("Minecraft Server closed normally with exit code: %1").arg(exitCode));
+    }
+    else if(exitStatus == QProcess::CrashExit)
+    {
+        ui->serverLogTextEdit->append(tr("Minecraft Server exited abnormally"));
+    }
+
+    ui->actionStart->setEnabled(true);
+    ui->actionStop->setEnabled(false);
+
+    m_pServerProcess->deleteLater();
+    m_pServerProcess = 0;
+}
+
+void MainWindow::onStandardOutput()
+{
+    QByteArray ba;
+    QString str;
+
+    while (m_pServerProcess->canReadLine())
+    {
+        str = m_pServerProcess->readLine();
+        if(!str.trimmed().isEmpty()) ui->serverLogTextEdit->append(str.trimmed());
+    }
+
+    ba = m_pServerProcess->readAllStandardOutput();
+
+    if (!ba.isEmpty())
+    {
+        str = QString( ba );
+        if(!str.trimmed().isEmpty()) ui->serverLogTextEdit->append(str.trimmed());
+    }
+}
+
+void MainWindow::onStandardError()
+{
+    QByteArray ba;
+    QString str;
+
+    while (m_pServerProcess->canReadLine())
+    {
+        str = m_pServerProcess->readLine();
+        if(!str.trimmed().isEmpty()) ui->serverLogTextEdit->append(str.trimmed());
+    }
+
+    ba = m_pServerProcess->readAllStandardError();
+
+    if (!ba.isEmpty())
+    {
+        str = QString( ba );
+        if(!str.trimmed().isEmpty()) ui->serverLogTextEdit->append(str.trimmed());
+    }
 }
 
 void MainWindow::on_actionStop_triggered()
 {
-
+    if(m_pServerProcess)
+    {
+        if(m_pServerProcess->state() == QProcess::Running)
+        {
+            if(m_pServerProcess->isWritable())
+            {
+                m_pServerProcess->write("stop\n");
+                m_pServerProcess->waitForBytesWritten();
+            }
+        }
+    }
 }

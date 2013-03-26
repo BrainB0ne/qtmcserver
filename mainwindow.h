@@ -23,6 +23,7 @@
 #include <QMessageBox>
 #include <QMenu>
 #include <QCloseEvent>
+#include <QProcess>
 
 namespace Ui {
 class MainWindow;
@@ -37,6 +38,12 @@ public:
     ~MainWindow();
 
     void initialize();
+
+public slots:
+    void onStart();
+    void onFinish(int exitCode, QProcess::ExitStatus exitStatus);
+    void onStandardOutput();
+    void onStandardError();
 
 protected:
     void closeEvent(QCloseEvent *event);
@@ -68,6 +75,7 @@ private:
     QMenu *trayIconMenu;
 
     bool m_bTrayWarningShowed;
+    QProcess *m_pServerProcess;
 };
 
 #endif // MAINWINDOW_H
