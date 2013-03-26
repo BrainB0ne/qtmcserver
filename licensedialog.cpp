@@ -34,7 +34,7 @@ LicenseDialog::~LicenseDialog()
     delete ui;
 }
 
-void LicenseDialog::initialize()
+void LicenseDialog::resetVerticalScrollBar()
 {
     ui->licenseTextEdit->verticalScrollBar()->setValue(0);
 }

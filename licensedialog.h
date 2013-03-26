@@ -32,7 +32,7 @@ public:
     explicit LicenseDialog(QWidget *parent = 0);
     ~LicenseDialog();
 
-    void initialize();
+    void resetVerticalScrollBar();
     void fillLicenseTextEdit();
     
 private:

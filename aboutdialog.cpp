@@ -71,7 +71,7 @@ void AboutDialog::slotLicenseButtonClicked()
     }
 
     m_pLicenseDlg->show();
-    m_pLicenseDlg->initialize();
+    m_pLicenseDlg->resetVerticalScrollBar();
 
     QApplication::restoreOverrideCursor();
 }
