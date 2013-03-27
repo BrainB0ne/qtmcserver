@@ -39,6 +39,15 @@ public:
 
     void initialize();
 
+    void setMinecraftServerPath(const QString& mcServerPath) {m_mcServerPath = mcServerPath;}
+    QString getMinecraftServerPath() {return m_mcServerPath;}
+
+    void setCustomJavaPath(const QString& customJavaPath) {m_customJavaPath = customJavaPath;}
+    QString getCustomJavaPath() {return m_customJavaPath;}
+
+    void setIsCustomJavaPath(bool isCustomJavaPath) {m_isCustomJavaPath = isCustomJavaPath;}
+    bool isCustomJavaPath() {return m_isCustomJavaPath;}
+
 public slots:
     void onStart();
     void onFinish(int exitCode, QProcess::ExitStatus exitStatus);
@@ -60,6 +69,8 @@ private slots:
     void on_actionSettings_triggered();
     void on_actionStart_triggered();
     void on_actionStop_triggered();
+    void on_sendCommandButton_clicked();
+    void on_serverCommandLineEdit_returnPressed();
 
 private:
     Ui::MainWindow *ui;
@@ -76,6 +87,10 @@ private:
 
     bool m_bTrayWarningShowed;
     QProcess *m_pServerProcess;
+
+    QString m_customJavaPath;
+    QString m_mcServerPath;
+    bool m_isCustomJavaPath;
 };
 
 #endif // MAINWINDOW_H

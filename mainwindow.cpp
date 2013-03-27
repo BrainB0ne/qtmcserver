@@ -33,12 +33,13 @@ MainWindow::MainWindow(QWidget *parent) :
     maximizeAction = 0;
     restoreAction = 0;
     quitAction = 0;
-    startServerAction = 0;
-    stopServerAction = 0;
     trayIcon = 0;
     trayIconMenu = 0;
 
     m_pServerProcess = 0;
+
+    m_mcServerPath = "";
+    m_customJavaPath = "";
 }
 
 MainWindow::~MainWindow()
@@ -59,6 +60,13 @@ void MainWindow::initialize()
     {
         trayIcon->show();
     }
+
+    m_pServerProcess = new QProcess(this);
+
+    connect( m_pServerProcess, SIGNAL(started()), SLOT(onStart()) );
+    connect( m_pServerProcess, SIGNAL(finished(int,QProcess::ExitStatus)), SLOT(onFinish(int,QProcess::ExitStatus)) );
+    connect( m_pServerProcess, SIGNAL(readyReadStandardOutput()), SLOT(onStandardOutput()) );
+    connect( m_pServerProcess, SIGNAL(readyReadStandardError()), SLOT(onStandardError()) );
 }
 
 void MainWindow::closeEvent(QCloseEvent *event)
@@ -93,12 +101,6 @@ void MainWindow::createActions()
 
     quitAction = new QAction(tr("E&xit"), this);
     connect(quitAction, SIGNAL(triggered()), this, SLOT(on_actionExit_triggered()));
-
-    startServerAction = new QAction(tr("&Start Server"), this);
-    connect(startServerAction, SIGNAL(triggered()), this, SLOT(on_actionStart_triggered()));
-
-    stopServerAction = new QAction(tr("Sto&p Server"), this);
-    connect(stopServerAction, SIGNAL(triggered()), this, SLOT(on_actionStop_triggered()));
 }
 
 void MainWindow::createTrayIcon()
@@ -111,8 +113,8 @@ void MainWindow::createTrayIcon()
         trayIconMenu->addAction(maximizeAction);
         trayIconMenu->addAction(restoreAction);
         trayIconMenu->addSeparator();
-        trayIconMenu->addAction(startServerAction);
-        trayIconMenu->addAction(stopServerAction);
+        trayIconMenu->addAction(ui->actionStart);
+        trayIconMenu->addAction(ui->actionStop);
         trayIconMenu->addSeparator();
         trayIconMenu->addAction(quitAction);
 
@@ -161,7 +163,23 @@ void MainWindow::on_actionAbout_triggered()
 
 void MainWindow::on_actionExit_triggered()
 {
-    qApp->quit();
+    if(m_pServerProcess)
+    {
+        if(m_pServerProcess->state() == QProcess::Running)
+        {
+            on_actionStop_triggered();
+            m_pServerProcess->waitForFinished();
+        }
+
+        if(m_pServerProcess->state() == QProcess::NotRunning)
+        {
+            qApp->quit();
+        }
+    }
+    else
+    {
+        qApp->quit();
+    }
 }
 
 void MainWindow::on_actionSettings_triggered()
@@ -170,7 +188,18 @@ void MainWindow::on_actionSettings_triggered()
 
     if(settingsDlg)
     {
-        settingsDlg->exec();
+        settingsDlg->setIsCustomJavaPath(m_isCustomJavaPath);
+        settingsDlg->setCustomJavaPath(m_customJavaPath);
+        settingsDlg->setMinecraftServerPath(m_mcServerPath);
+
+        settingsDlg->initialize();
+
+        if(settingsDlg->exec() == QDialog::Accepted)
+        {
+            m_mcServerPath = settingsDlg->getMinecraftServerPath();
+            m_customJavaPath = settingsDlg->getCustomJavaPath();
+            m_isCustomJavaPath = settingsDlg->isCustomJavaPath();
+        }
 
         delete settingsDlg;
         settingsDlg = 0;
@@ -179,23 +208,13 @@ void MainWindow::on_actionSettings_triggered()
 
 void MainWindow::on_actionStart_triggered()
 {
-    if(!m_pServerProcess)
+    if(m_pServerProcess)
     {
-        m_pServerProcess = new QProcess(this);
+        QStringList arguments;
+        arguments << "-Xms1024M" << "-Xmx1024M" << "-jar" << "minecraft_server.jar" << "nogui";
 
-        connect( m_pServerProcess, SIGNAL(started()), SLOT(onStart()) );
-        connect( m_pServerProcess, SIGNAL(finished(int,QProcess::ExitStatus)), SLOT(onFinish(int,QProcess::ExitStatus)) );
-        connect( m_pServerProcess, SIGNAL(readyReadStandardOutput()), SLOT(onStandardOutput()) );
-        connect( m_pServerProcess, SIGNAL(readyReadStandardError()), SLOT(onStandardError()) );
-
-        if(m_pServerProcess)
-        {
-            QStringList arguments;
-            arguments << "-Xms1024M" << "-Xmx1024M" << "-jar" << "minecraft_server.jar" << "nogui";
-
-            m_pServerProcess->start("java", arguments, QIODevice::ReadWrite | QIODevice::Unbuffered);
-            m_pServerProcess->waitForStarted();
-        }
+        m_pServerProcess->start("java", arguments, QIODevice::ReadWrite | QIODevice::Unbuffered);
+        m_pServerProcess->waitForStarted();
     }
 }
 
@@ -220,21 +239,16 @@ void MainWindow::onFinish(int exitCode, QProcess::ExitStatus exitStatus)
 
     ui->actionStart->setEnabled(true);
     ui->actionStop->setEnabled(false);
-
-    m_pServerProcess->deleteLater();
-    m_pServerProcess = 0;
 }
 
 void MainWindow::onStandardOutput()
 {
-    QByteArray ba;
+    QByteArray baOutput = m_pServerProcess->readAllStandardOutput();
     QString str;
 
-    ba = m_pServerProcess->readAllStandardOutput();
-
-    if (!ba.isEmpty())
+    if (!baOutput.isEmpty())
     {
-        str = QString( ba ).trimmed();
+        str = QString(baOutput).trimmed();
 
         if(!str.isEmpty())
             ui->serverLogTextEdit->append(str);
@@ -243,14 +257,12 @@ void MainWindow::onStandardOutput()
 
 void MainWindow::onStandardError()
 {
-    QByteArray ba;
+    QByteArray baError = m_pServerProcess->readAllStandardError();
     QString str;
 
-    ba = m_pServerProcess->readAllStandardError();
-
-    if (!ba.isEmpty())
+    if (!baError.isEmpty())
     {
-        str = QString( ba ).trimmed();
+        str = QString(baError).trimmed();
 
         if(!str.isEmpty())
             ui->serverLogTextEdit->append(str);
@@ -270,4 +282,31 @@ void MainWindow::on_actionStop_triggered()
             }
         }
     }
+}
+
+void MainWindow::on_sendCommandButton_clicked()
+{
+    if(ui->serverCommandLineEdit->text().isEmpty())
+        return;
+
+    if(m_pServerProcess)
+    {
+        if(m_pServerProcess->state() == QProcess::Running)
+        {
+            if(m_pServerProcess->isWritable())
+            {
+                QByteArray command = (ui->serverCommandLineEdit->text() + QString("\n")).toAscii();
+
+                m_pServerProcess->write(command);
+                m_pServerProcess->waitForBytesWritten();
+
+                ui->serverCommandLineEdit->clear();
+            }
+        }
+    }
+}
+
+void MainWindow::on_serverCommandLineEdit_returnPressed()
+{
+    on_sendCommandButton_clicked();
 }
