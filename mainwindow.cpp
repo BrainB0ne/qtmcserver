@@ -230,18 +230,14 @@ void MainWindow::onStandardOutput()
     QByteArray ba;
     QString str;
 
-    while (m_pServerProcess->canReadLine())
-    {
-        str = m_pServerProcess->readLine();
-        if(!str.trimmed().isEmpty()) ui->serverLogTextEdit->append(str.trimmed());
-    }
-
     ba = m_pServerProcess->readAllStandardOutput();
 
     if (!ba.isEmpty())
     {
-        str = QString( ba );
-        if(!str.trimmed().isEmpty()) ui->serverLogTextEdit->append(str.trimmed());
+        str = QString( ba ).trimmed();
+
+        if(!str.isEmpty())
+            ui->serverLogTextEdit->append(str);
     }
 }
 
@@ -250,18 +246,14 @@ void MainWindow::onStandardError()
     QByteArray ba;
     QString str;
 
-    while (m_pServerProcess->canReadLine())
-    {
-        str = m_pServerProcess->readLine();
-        if(!str.trimmed().isEmpty()) ui->serverLogTextEdit->append(str.trimmed());
-    }
-
     ba = m_pServerProcess->readAllStandardError();
 
     if (!ba.isEmpty())
     {
-        str = QString( ba );
-        if(!str.trimmed().isEmpty()) ui->serverLogTextEdit->append(str.trimmed());
+        str = QString( ba ).trimmed();
+
+        if(!str.isEmpty())
+            ui->serverLogTextEdit->append(str);
     }
 }
 
