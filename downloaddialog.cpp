@@ -82,8 +82,8 @@ void DownloadDialog::startDownload()
 {
     QApplication::setOverrideCursor(Qt::WaitCursor);
 
-    ui->downloadLogTextEdit->append(tr("Connecting to %1\n").arg(MCSERVER_URL));
-    ui->downloadLogTextEdit->append(tr("Downloading Minecraft Server... Please wait...\n"));
+    ui->downloadLogTextEdit->append(tr("Connecting to %1").arg(MCSERVER_URL));
+    ui->downloadLogTextEdit->append(tr("Downloading Minecraft Server... Please wait..."));
 
     doDownload( QUrl(MCSERVER_URL) );
 }
@@ -129,7 +129,7 @@ bool DownloadDialog::saveToDisk(const QString &filename, QIODevice *data)
     QFile file(filename);
     if (!file.open(QIODevice::WriteOnly))
     {
-        ui->downloadLogTextEdit->append(tr("<font color=\"red\">Could not open %1 for writing: %2</font>\n")
+        ui->downloadLogTextEdit->append(tr("<font color=\"red\">Could not open %1 for writing: %2</font>")
                                         .arg(QDir::toNativeSeparators(filename))
                                         .arg(file.errorString()));
         return false;
@@ -149,7 +149,7 @@ void DownloadDialog::downloadFinished(QNetworkReply *reply)
 
     if (reply->error())
     {
-        ui->downloadLogTextEdit->append(tr("<font color=\"red\">Download of %1 failed: %2</font>\n")
+        ui->downloadLogTextEdit->append(tr("<font color=\"red\">Download of %1 failed: %2</font>")
                                         .arg(url.toEncoded().constData())
                                         .arg(reply->errorString()));
     }
@@ -158,7 +158,7 @@ void DownloadDialog::downloadFinished(QNetworkReply *reply)
         QString filename = saveFileName(url, m_downloadPath);
         if (saveToDisk(filename, reply))
         {
-            ui->downloadLogTextEdit->append(tr("Download of %1 succeeded (saved to %2)\n")
+            ui->downloadLogTextEdit->append(tr("Download of %1 succeeded (saved to %2)")
                                             .arg(url.toEncoded().constData())
                                             .arg(QDir::toNativeSeparators(filename)));
         }
