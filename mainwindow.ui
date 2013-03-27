@@ -162,6 +162,13 @@
   </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
+ <tabstops>
+  <tabstop>tabWidget</tabstop>
+  <tabstop>serverLogTextEdit</tabstop>
+  <tabstop>serverCommandLineEdit</tabstop>
+  <tabstop>sendCommandButton</tabstop>
+  <tabstop>serverPropertiesTextEdit</tabstop>
+ </tabstops>
  <resources>
   <include location="qtmcserver.qrc"/>
  </resources>
