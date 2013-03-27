@@ -42,8 +42,14 @@ DownloadDialog::~DownloadDialog()
 
 void DownloadDialog::on_downloadButton_clicked()
 {
+    QString openDirectory = "";
+
+#ifdef Q_OS_UNIX
+    openDirectory = "/home";
+#endif
+
     QString dir = QFileDialog::getExistingDirectory(this, tr("Select Download Folder"),
-                                                    "/home",
+                                                    openDirectory,
                                                     QFileDialog::ShowDirsOnly
                                                     | QFileDialog::DontResolveSymlinks);
     if(!dir.isEmpty())
