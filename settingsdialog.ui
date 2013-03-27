@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>387</width>
+    <width>481</width>
     <height>297</height>
    </rect>
   </property>
@@ -37,12 +37,16 @@
       <item row="1" column="0">
        <widget class="QRadioButton" name="customRadioButton">
         <property name="text">
-         <string>Custom Location:</string>
+         <string>Use Custom Location:</string>
         </property>
        </widget>
       </item>
       <item row="1" column="1">
-       <widget class="QLineEdit" name="customJavaLineEdit"/>
+       <widget class="QLineEdit" name="customJavaLineEdit">
+        <property name="readOnly">
+         <bool>true</bool>
+        </property>
+       </widget>
       </item>
       <item row="1" column="2">
        <widget class="QPushButton" name="javaBrowseButton">
@@ -79,7 +83,11 @@
     </widget>
    </item>
    <item row="3" column="0" colspan="2">
-    <widget class="QLineEdit" name="mcServerFileLineEdit"/>
+    <widget class="QLineEdit" name="mcServerFileLineEdit">
+     <property name="readOnly">
+      <bool>true</bool>
+     </property>
+    </widget>
    </item>
    <item row="3" column="2">
     <widget class="QPushButton" name="mcServerBrowseButton">
@@ -119,6 +127,16 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>environmentRadioButton</tabstop>
+  <tabstop>customRadioButton</tabstop>
+  <tabstop>customJavaLineEdit</tabstop>
+  <tabstop>javaBrowseButton</tabstop>
+  <tabstop>downloadButton</tabstop>
+  <tabstop>mcServerFileLineEdit</tabstop>
+  <tabstop>mcServerBrowseButton</tabstop>
+  <tabstop>buttonBox</tabstop>
+ </tabstops>
  <resources>
   <include location="qtmcserver.qrc"/>
  </resources>

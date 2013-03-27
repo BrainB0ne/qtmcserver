@@ -31,12 +31,31 @@ class SettingsDialog : public QDialog
 public:
     explicit SettingsDialog(QWidget *parent = 0);
     ~SettingsDialog();
-    
+
+    void initialize();
+
+    void setMinecraftServerPath(const QString& mcServerPath) {m_mcServerPath = mcServerPath;}
+    QString getMinecraftServerPath() {return m_mcServerPath;}
+
+    void setCustomJavaPath(const QString& customJavaPath) {m_customJavaPath = customJavaPath;}
+    QString getCustomJavaPath() {return m_customJavaPath;}
+
+    void setIsCustomJavaPath(bool isCustomJavaPath) {m_isCustomJavaPath = isCustomJavaPath;}
+    bool isCustomJavaPath() {return m_isCustomJavaPath;}
+
 private slots:
     void on_downloadButton_clicked();
+    void on_javaBrowseButton_clicked();
+    void on_mcServerBrowseButton_clicked();
+    void on_buttonBox_accepted();
+    void on_buttonBox_rejected();
 
 private:
     Ui::SettingsDialog *ui;
+
+    QString m_customJavaPath;
+    QString m_mcServerPath;
+    bool m_isCustomJavaPath;
 };
 
 #endif // SETTINGSDIALOG_H
