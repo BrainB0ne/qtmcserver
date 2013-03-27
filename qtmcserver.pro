@@ -84,4 +84,6 @@ OTHER_FILES += \
     images/qtmcserver.ico \
     images/exit.png \
     images/about.png \
-    images/download.png
+    images/download.png \
+    images/exportlog.png \
+    images/clear.png

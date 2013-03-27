@@ -21,6 +21,9 @@
 #include "aboutdialog.h"
 #include "settingsdialog.h"
 
+#include <QFileDialog>
+#include <QTextStream>
+
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
@@ -45,6 +48,11 @@ MainWindow::MainWindow(QWidget *parent) :
 MainWindow::~MainWindow()
 {
     delete ui;
+}
+
+QString MainWindow::htmlBold(const QString &msg)
+{
+    return QString("<b>%1</b>").arg(msg);
 }
 
 void MainWindow::initialize()
@@ -220,7 +228,7 @@ void MainWindow::on_actionStart_triggered()
 
 void MainWindow::onStart()
 {
-    ui->serverLogTextEdit->append(tr("Starting Minecraft Server..."));
+    ui->serverLogTextEdit->append(htmlBold(tr("Starting Minecraft Server...")));
 
     ui->actionStart->setEnabled(false);
     ui->actionStop->setEnabled(true);
@@ -230,11 +238,11 @@ void MainWindow::onFinish(int exitCode, QProcess::ExitStatus exitStatus)
 {
     if(exitStatus == QProcess::NormalExit)
     {
-        ui->serverLogTextEdit->append(tr("Minecraft Server closed normally with exit code: %1").arg(exitCode));
+        ui->serverLogTextEdit->append(htmlBold(tr("Minecraft Server closed normally with exit code: %1").arg(exitCode)));
     }
     else if(exitStatus == QProcess::CrashExit)
     {
-        ui->serverLogTextEdit->append(tr("Minecraft Server exited abnormally"));
+        ui->serverLogTextEdit->append(htmlBold(tr("Minecraft Server exited abnormally")));
     }
 
     ui->actionStart->setEnabled(true);
@@ -295,6 +303,8 @@ void MainWindow::on_sendCommandButton_clicked()
         {
             if(m_pServerProcess->isWritable())
             {
+                ui->serverLogTextEdit->append(htmlBold(QString(">> ") + ui->serverCommandLineEdit->text()));
+
                 QByteArray command = (ui->serverCommandLineEdit->text() + QString("\n")).toAscii();
 
                 m_pServerProcess->write(command);
@@ -309,4 +319,28 @@ void MainWindow::on_sendCommandButton_clicked()
 void MainWindow::on_serverCommandLineEdit_returnPressed()
 {
     on_sendCommandButton_clicked();
+}
+
+void MainWindow::on_actionClear_triggered()
+{
+    ui->serverLogTextEdit->clear();
+}
+
+void MainWindow::on_actionExport_triggered()
+{
+    QString fileName = QFileDialog::getSaveFileName(this, tr("Export Console Log"),
+                               "mcserverlog.txt",
+                               tr("Text Files (*.txt)"));
+    if(!fileName.isEmpty())
+    {
+        QFile outfile;
+        outfile.setFileName(fileName);
+
+        if(outfile.open(QIODevice::WriteOnly | QIODevice::Text))
+        {
+            QTextStream out(&outfile);
+            out << ui->serverLogTextEdit->toPlainText() << endl;
+            outfile.close();
+        }
+    }
 }

@@ -31,6 +31,12 @@
        <layout class="QGridLayout" name="gridLayout_2">
         <item row="0" column="0" colspan="2">
          <widget class="QTextEdit" name="serverLogTextEdit">
+          <property name="font">
+           <font>
+            <family>Lucida Console</family>
+            <pointsize>9</pointsize>
+           </font>
+          </property>
           <property name="readOnly">
            <bool>true</bool>
           </property>
@@ -96,8 +102,16 @@
     <addaction name="actionStart"/>
     <addaction name="actionStop"/>
    </widget>
+   <widget class="QMenu" name="menu_Log">
+    <property name="title">
+     <string>&amp;Log</string>
+    </property>
+    <addaction name="actionClear"/>
+    <addaction name="actionExport"/>
+   </widget>
    <addaction name="menu_File"/>
    <addaction name="menu_Server"/>
+   <addaction name="menu_Log"/>
    <addaction name="menu_Help"/>
   </widget>
   <widget class="QToolBar" name="mainToolBar">
@@ -112,6 +126,9 @@
    <addaction name="actionStart"/>
    <addaction name="actionStop"/>
    <addaction name="separator"/>
+   <addaction name="actionClear"/>
+   <addaction name="actionExport"/>
+   <addaction name="separator"/>
    <addaction name="actionAbout"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
@@ -123,6 +140,9 @@
    <property name="text">
     <string>E&amp;xit</string>
    </property>
+   <property name="toolTip">
+    <string>Exit Qt Minecraft Server</string>
+   </property>
   </action>
   <action name="actionAbout">
    <property name="icon">
@@ -131,6 +151,9 @@
    </property>
    <property name="text">
     <string>&amp;About</string>
+   </property>
+   <property name="toolTip">
+    <string>About Qt Minecraft Server</string>
    </property>
   </action>
   <action name="actionSettings">
@@ -141,6 +164,9 @@
    <property name="text">
     <string>&amp;Settings</string>
    </property>
+   <property name="toolTip">
+    <string>Qt Minecraft Server Settings</string>
+   </property>
   </action>
   <action name="actionStart">
    <property name="icon">
@@ -150,6 +176,9 @@
    <property name="text">
     <string>&amp;Start</string>
    </property>
+   <property name="toolTip">
+    <string>Start Minecraft Server</string>
+   </property>
   </action>
   <action name="actionStop">
    <property name="icon">
@@ -158,6 +187,30 @@
    </property>
    <property name="text">
     <string>Sto&amp;p</string>
+   </property>
+   <property name="toolTip">
+    <string>Stop Minecraft Server</string>
+   </property>
+  </action>
+  <action name="actionClear">
+   <property name="icon">
+    <iconset resource="qtmcserver.qrc">
+     <normaloff>:/images/clear.png</normaloff>:/images/clear.png</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;Clear</string>
+   </property>
+   <property name="toolTip">
+    <string>Clear Console Log</string>
+   </property>
+  </action>
+  <action name="actionExport">
+   <property name="icon">
+    <iconset resource="qtmcserver.qrc">
+     <normaloff>:/images/exportlog.png</normaloff>:/images/exportlog.png</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;Export ...</string>
    </property>
   </action>
  </widget>

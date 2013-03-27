@@ -39,6 +39,8 @@ public:
 
     void initialize();
 
+    QString htmlBold(const QString& msg);
+
     void setMinecraftServerPath(const QString& mcServerPath) {m_mcServerPath = mcServerPath;}
     QString getMinecraftServerPath() {return m_mcServerPath;}
 
@@ -71,6 +73,10 @@ private slots:
     void on_actionStop_triggered();
     void on_sendCommandButton_clicked();
     void on_serverCommandLineEdit_returnPressed();
+
+    void on_actionClear_triggered();
+
+    void on_actionExport_triggered();
 
 private:
     Ui::MainWindow *ui;

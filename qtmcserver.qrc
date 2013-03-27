@@ -9,5 +9,7 @@
         <file>images/settings.png</file>
         <file>images/about.png</file>
         <file>images/download.png</file>
+        <file>images/clear.png</file>
+        <file>images/exportlog.png</file>
     </qresource>
 </RCC>
