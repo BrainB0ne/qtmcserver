@@ -71,6 +71,9 @@ void MainWindow::initialize()
 
     ui->actionStart->setEnabled(true);
     ui->actionStop->setEnabled(false);
+    ui->actionSettings->setEnabled(true);
+    ui->serverPropertiesTextEdit->setEnabled(true);
+    ui->sendCommandButton->setEnabled(false);
 
     if(trayIcon)
     {
@@ -261,12 +264,36 @@ void MainWindow::on_actionSettings_triggered()
 
 void MainWindow::on_actionStart_triggered()
 {
+    if(m_mcServerPath.isEmpty())
+    {
+        QMessageBox::information(this, tr("Qt Minecraft Server"),
+                                 tr("No Minecraft Server File available!\nPlease select a Minecraft Server File at Qt Minecraft Server Settings."));
+
+        on_actionSettings_triggered();
+
+        return;
+    }
+
     if(m_pServerProcess)
     {
-        QStringList arguments;
-        arguments << "-Xms1024M" << "-Xmx1024M" << "-jar" << "minecraft_server.jar" << "nogui";
+        QFileInfo mcServerFileInfo = QFileInfo(m_mcServerPath);
+        QString workingDir = mcServerFileInfo.absolutePath();
+        QString mcServerFile = mcServerFileInfo.fileName();
 
-        m_pServerProcess->start("java", arguments, QIODevice::ReadWrite | QIODevice::Unbuffered);
+        m_pServerProcess->setWorkingDirectory(workingDir);
+
+        QStringList arguments;
+        arguments << "-Xms1024M" << "-Xmx1024M" << "-jar" << mcServerFile << "nogui";
+
+        if(m_useCustomJavaPath)
+        {
+            m_pServerProcess->start(m_customJavaPath, arguments, QIODevice::ReadWrite | QIODevice::Unbuffered);
+        }
+        else
+        {
+            m_pServerProcess->start("java", arguments, QIODevice::ReadWrite | QIODevice::Unbuffered);
+        }
+
         m_pServerProcess->waitForStarted();
     }
 }
@@ -277,6 +304,8 @@ void MainWindow::onStart()
 
     ui->actionStart->setEnabled(false);
     ui->actionStop->setEnabled(true);
+    ui->actionSettings->setEnabled(false);
+    ui->serverPropertiesTextEdit->setEnabled(false);
 }
 
 void MainWindow::onFinish(int exitCode, QProcess::ExitStatus exitStatus)
@@ -292,6 +321,8 @@ void MainWindow::onFinish(int exitCode, QProcess::ExitStatus exitStatus)
 
     ui->actionStart->setEnabled(true);
     ui->actionStop->setEnabled(false);
+    ui->actionSettings->setEnabled(true);
+    ui->serverPropertiesTextEdit->setEnabled(true);
 }
 
 void MainWindow::onStandardOutput()
@@ -388,4 +419,9 @@ void MainWindow::on_actionExport_triggered()
             outfile.close();
         }
     }
+}
+
+void MainWindow::on_serverCommandLineEdit_textEdited(const QString &text)
+{
+    ui->sendCommandButton->setEnabled(!text.isEmpty());
 }

@@ -78,10 +78,9 @@ private slots:
     void on_actionStop_triggered();
     void on_sendCommandButton_clicked();
     void on_serverCommandLineEdit_returnPressed();
-
     void on_actionClear_triggered();
-
     void on_actionExport_triggered();
+    void on_serverCommandLineEdit_textEdited(const QString &text);
 
 private:
     Ui::MainWindow *ui;
