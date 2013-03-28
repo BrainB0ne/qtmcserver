@@ -20,7 +20,7 @@
   <widget class="QWidget" name="centralWidget">
    <layout class="QGridLayout" name="gridLayout">
     <item row="0" column="0">
-     <widget class="QTabWidget" name="tabWidget">
+     <widget class="QTabWidget" name="mainTabWidget">
       <property name="currentIndex">
        <number>0</number>
       </property>
@@ -216,7 +216,7 @@
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <tabstops>
-  <tabstop>tabWidget</tabstop>
+  <tabstop>mainTabWidget</tabstop>
   <tabstop>serverLogTextEdit</tabstop>
   <tabstop>serverCommandLineEdit</tabstop>
   <tabstop>sendCommandButton</tabstop>
