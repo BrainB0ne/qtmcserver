@@ -116,7 +116,7 @@ void SettingsDialog::accept()
     if(ui->mcServerFileLineEdit->text().isEmpty())
     {
         QMessageBox::information(this, tr("Qt Minecraft Server"),
-                                 tr("No Minecraft Server File specified!\nPlease download and specify a Minecraft Server File before continuing."));
+                                 tr("No Minecraft Server File selected!\nPlease select a Minecraft Server File before continuing."));
 
     }
     else
