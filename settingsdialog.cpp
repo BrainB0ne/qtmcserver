@@ -21,6 +21,7 @@
 #include "downloaddialog.h"
 
 #include <QFileDialog>
+#include <QMessageBox>
 
 SettingsDialog::SettingsDialog(QWidget *parent) :
     QDialog(parent),
@@ -28,6 +29,7 @@ SettingsDialog::SettingsDialog(QWidget *parent) :
 {
     ui->setupUi(this);
 
+    m_useCustomJavaPath = false;
     m_mcServerPath = "";
     m_customJavaPath = "";
 }
@@ -39,7 +41,7 @@ SettingsDialog::~SettingsDialog()
 
 void SettingsDialog::initialize()
 {
-    ui->customRadioButton->setChecked(m_isCustomJavaPath);
+    ui->customRadioButton->setChecked(m_useCustomJavaPath);
     ui->customJavaLineEdit->setText(m_customJavaPath);
     ui->mcServerFileLineEdit->setText(m_mcServerPath);
 }
@@ -109,16 +111,23 @@ void SettingsDialog::on_mcServerBrowseButton_clicked()
     }
 }
 
+void SettingsDialog::accept()
+{
+    if(ui->mcServerFileLineEdit->text().isEmpty())
+    {
+        QMessageBox::information(this, tr("Qt Minecraft Server"),
+                                 tr("No Minecraft Server File specified!\nPlease download and specify a Minecraft Server File before continuing."));
+
+    }
+    else
+    {
+        QDialog::accept();
+    }
+}
+
 void SettingsDialog::on_buttonBox_accepted()
 {
     m_mcServerPath = ui->mcServerFileLineEdit->text();
     m_customJavaPath = ui->customJavaLineEdit->text();
-    m_isCustomJavaPath = ui->customRadioButton->isChecked();
-
-    accept();
-}
-
-void SettingsDialog::on_buttonBox_rejected()
-{
-    reject();
+    m_useCustomJavaPath = ui->customRadioButton->isChecked();
 }

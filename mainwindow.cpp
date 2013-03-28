@@ -41,12 +41,20 @@ MainWindow::MainWindow(QWidget *parent) :
 
     m_pServerProcess = 0;
 
+    m_pSettings = 0;
+    m_useCustomJavaPath = false;
     m_mcServerPath = "";
     m_customJavaPath = "";
 }
 
 MainWindow::~MainWindow()
 {
+    if(m_pSettings)
+    {
+        delete m_pSettings;
+        m_pSettings = 0;
+    }
+
     delete ui;
 }
 
@@ -56,7 +64,7 @@ QString MainWindow::htmlBold(const QString &msg)
 }
 
 void MainWindow::initialize()
-{    
+{
     createActions();
     createTrayIcon();
     setIcon();
@@ -75,6 +83,43 @@ void MainWindow::initialize()
     connect( m_pServerProcess, SIGNAL(finished(int,QProcess::ExitStatus)), SLOT(onFinish(int,QProcess::ExitStatus)) );
     connect( m_pServerProcess, SIGNAL(readyReadStandardOutput()), SLOT(onStandardOutput()) );
     connect( m_pServerProcess, SIGNAL(readyReadStandardError()), SLOT(onStandardError()) );
+
+    m_pSettings = new QSettings(QSettings::IniFormat, QSettings::UserScope, "Qt Minecraft Server", "qtmcserver", this);
+
+    loadSettings();
+
+    if(m_mcServerPath.isEmpty())
+    {
+        on_actionSettings_triggered();
+    }
+}
+
+void MainWindow::closeApplication()
+{
+    saveSettings();
+    qApp->quit();
+}
+
+void MainWindow::loadSettings()
+{
+    if(m_pSettings)
+    {
+        QString strUseCustomJavaPath = m_pSettings->value("Settings/UseCustomJavaPath", "no").toString();
+        m_useCustomJavaPath = (strUseCustomJavaPath == "yes") ? true : false;
+
+        m_customJavaPath = m_pSettings->value("Settings/CustomJavaPath", "").toString();
+        m_mcServerPath = m_pSettings->value("Settings/MinecraftServerPath", "").toString();
+    }
+}
+
+void MainWindow::saveSettings()
+{
+    if(m_pSettings)
+    {
+        m_pSettings->setValue("Settings/UseCustomJavaPath", m_useCustomJavaPath ? "yes" : "no");
+        m_pSettings->setValue("Settings/CustomJavaPath", m_customJavaPath);
+        m_pSettings->setValue("Settings/MinecraftServerPath", m_mcServerPath);
+    }
 }
 
 void MainWindow::closeEvent(QCloseEvent *event)
@@ -181,12 +226,12 @@ void MainWindow::on_actionExit_triggered()
 
         if(m_pServerProcess->state() == QProcess::NotRunning)
         {
-            qApp->quit();
+            closeApplication();
         }
     }
     else
     {
-        qApp->quit();
+        closeApplication();
     }
 }
 
@@ -196,7 +241,7 @@ void MainWindow::on_actionSettings_triggered()
 
     if(settingsDlg)
     {
-        settingsDlg->setIsCustomJavaPath(m_isCustomJavaPath);
+        settingsDlg->setUseCustomJavaPath(m_useCustomJavaPath);
         settingsDlg->setCustomJavaPath(m_customJavaPath);
         settingsDlg->setMinecraftServerPath(m_mcServerPath);
 
@@ -206,7 +251,7 @@ void MainWindow::on_actionSettings_triggered()
         {
             m_mcServerPath = settingsDlg->getMinecraftServerPath();
             m_customJavaPath = settingsDlg->getCustomJavaPath();
-            m_isCustomJavaPath = settingsDlg->isCustomJavaPath();
+            m_useCustomJavaPath = settingsDlg->useCustomJavaPath();
         }
 
         delete settingsDlg;

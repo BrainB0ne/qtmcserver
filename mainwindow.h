@@ -24,6 +24,7 @@
 #include <QMenu>
 #include <QCloseEvent>
 #include <QProcess>
+#include <QSettings>
 
 namespace Ui {
 class MainWindow;
@@ -38,6 +39,10 @@ public:
     ~MainWindow();
 
     void initialize();
+    void closeApplication();
+
+    void loadSettings();
+    void saveSettings();
 
     QString htmlBold(const QString& msg);
 
@@ -47,8 +52,8 @@ public:
     void setCustomJavaPath(const QString& customJavaPath) {m_customJavaPath = customJavaPath;}
     QString getCustomJavaPath() {return m_customJavaPath;}
 
-    void setIsCustomJavaPath(bool isCustomJavaPath) {m_isCustomJavaPath = isCustomJavaPath;}
-    bool isCustomJavaPath() {return m_isCustomJavaPath;}
+    void setUseCustomJavaPath(bool useCustomJavaPath) {m_useCustomJavaPath = useCustomJavaPath;}
+    bool useCustomJavaPath() {return m_useCustomJavaPath;}
 
 public slots:
     void onStart();
@@ -94,9 +99,10 @@ private:
     bool m_bTrayWarningShowed;
     QProcess *m_pServerProcess;
 
+    QSettings* m_pSettings;
     QString m_customJavaPath;
     QString m_mcServerPath;
-    bool m_isCustomJavaPath;
+    bool m_useCustomJavaPath;
 };
 
 #endif // MAINWINDOW_H

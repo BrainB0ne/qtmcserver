@@ -40,22 +40,23 @@ public:
     void setCustomJavaPath(const QString& customJavaPath) {m_customJavaPath = customJavaPath;}
     QString getCustomJavaPath() {return m_customJavaPath;}
 
-    void setIsCustomJavaPath(bool isCustomJavaPath) {m_isCustomJavaPath = isCustomJavaPath;}
-    bool isCustomJavaPath() {return m_isCustomJavaPath;}
+    void setUseCustomJavaPath(bool useCustomJavaPath) {m_useCustomJavaPath = useCustomJavaPath;}
+    bool useCustomJavaPath() {return m_useCustomJavaPath;}
 
 private slots:
     void on_downloadButton_clicked();
     void on_javaBrowseButton_clicked();
     void on_mcServerBrowseButton_clicked();
     void on_buttonBox_accepted();
-    void on_buttonBox_rejected();
+
+    void accept();
 
 private:
     Ui::SettingsDialog *ui;
 
     QString m_customJavaPath;
     QString m_mcServerPath;
-    bool m_isCustomJavaPath;
+    bool m_useCustomJavaPath;
 };
 
 #endif // SETTINGSDIALOG_H
