@@ -62,7 +62,6 @@ public slots:
 private slots:
     void on_downloadButton_clicked();
     void on_buttonBox_accepted();
-    void on_buttonBox_rejected();
 
 private:
     Ui::DownloadDialog *ui;

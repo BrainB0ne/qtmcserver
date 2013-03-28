@@ -69,13 +69,6 @@ void DownloadDialog::on_downloadButton_clicked()
 void DownloadDialog::on_buttonBox_accepted()
 {
     m_saveLocation = ui->saveLineEdit->text();
-
-    accept();
-}
-
-void DownloadDialog::on_buttonBox_rejected()
-{
-    reject();
 }
 
 void DownloadDialog::startDownload()
