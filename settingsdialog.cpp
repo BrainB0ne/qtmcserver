@@ -32,6 +32,9 @@ SettingsDialog::SettingsDialog(QWidget *parent) :
     m_useCustomJavaPath = false;
     m_mcServerPath = "";
     m_customJavaPath = "";
+    m_xms = 512;
+    m_xmx = 512;
+    m_additionalParameters = "";
 }
 
 SettingsDialog::~SettingsDialog()
@@ -44,6 +47,9 @@ void SettingsDialog::initialize()
     ui->customRadioButton->setChecked(m_useCustomJavaPath);
     ui->customJavaLineEdit->setText(m_customJavaPath);
     ui->mcServerFileLineEdit->setText(m_mcServerPath);
+    ui->xmsSpinBox->setValue(m_xms);
+    ui->xmxSpinBox->setValue(m_xmx);
+    ui->additionalParametersLineEdit->setText(m_additionalParameters);
 }
 
 void SettingsDialog::on_downloadButton_clicked()
@@ -130,4 +136,7 @@ void SettingsDialog::on_buttonBox_accepted()
     m_mcServerPath = ui->mcServerFileLineEdit->text();
     m_customJavaPath = ui->customJavaLineEdit->text();
     m_useCustomJavaPath = ui->customRadioButton->isChecked();
+    m_xms = ui->xmsSpinBox->value();
+    m_xmx = ui->xmxSpinBox->value();
+    m_additionalParameters = ui->additionalParametersLineEdit->text();
 }

@@ -43,6 +43,15 @@ public:
     void setUseCustomJavaPath(bool useCustomJavaPath) {m_useCustomJavaPath = useCustomJavaPath;}
     bool useCustomJavaPath() {return m_useCustomJavaPath;}
 
+    void setAdditionalParameters(const QString& additionalParameters) {m_additionalParameters = additionalParameters;}
+    QString getAdditionalParameters() {return m_additionalParameters;}
+
+    void setXms(int xms) {m_xms = xms;}
+    int getXms() {return m_xms;}
+
+    void setXmx(int xmx) {m_xmx = xmx;}
+    int getXmx() {return m_xmx;}
+
 private slots:
     void on_downloadButton_clicked();
     void on_javaBrowseButton_clicked();
@@ -57,6 +66,10 @@ private:
     QString m_customJavaPath;
     QString m_mcServerPath;
     bool m_useCustomJavaPath;
+    int m_xms;
+    int m_xmx;
+    QString m_additionalParameters;
+
 };
 
 #endif // SETTINGSDIALOG_H

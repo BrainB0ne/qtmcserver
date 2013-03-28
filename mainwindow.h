@@ -55,6 +55,15 @@ public:
     void setUseCustomJavaPath(bool useCustomJavaPath) {m_useCustomJavaPath = useCustomJavaPath;}
     bool useCustomJavaPath() {return m_useCustomJavaPath;}
 
+    void setAdditionalParameters(const QString& additionalParameters) {m_additionalParameters = additionalParameters;}
+    QString getAdditionalParameters() {return m_additionalParameters;}
+
+    void setXms(int xms) {m_xms = xms;}
+    int getXms() {return m_xms;}
+
+    void setXmx(int xmx) {m_xmx = xmx;}
+    int getXmx() {return m_xmx;}
+
 public slots:
     void onStart();
     void onFinish(int exitCode, QProcess::ExitStatus exitStatus);
@@ -102,6 +111,9 @@ private:
     QString m_customJavaPath;
     QString m_mcServerPath;
     bool m_useCustomJavaPath;
+    int m_xms;
+    int m_xmx;
+    QString m_additionalParameters;
 };
 
 #endif // MAINWINDOW_H

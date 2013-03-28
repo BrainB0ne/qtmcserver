@@ -45,6 +45,9 @@ MainWindow::MainWindow(QWidget *parent) :
     m_useCustomJavaPath = false;
     m_mcServerPath = "";
     m_customJavaPath = "";
+    m_xms = 512;
+    m_xmx = 512;
+    m_additionalParameters = "";
 }
 
 MainWindow::~MainWindow()
@@ -112,6 +115,9 @@ void MainWindow::loadSettings()
 
         m_customJavaPath = m_pSettings->value("Settings/CustomJavaPath", "").toString();
         m_mcServerPath = m_pSettings->value("Settings/MinecraftServerPath", "").toString();
+        m_xms =  m_pSettings->value("Settings/Xms", "512").toInt();
+        m_xmx =  m_pSettings->value("Settings/Xmx", "512").toInt();
+        m_additionalParameters = m_pSettings->value("Settings/AdditionalParameters", "").toString();
     }
 }
 
@@ -122,6 +128,9 @@ void MainWindow::saveSettings()
         m_pSettings->setValue("Settings/UseCustomJavaPath", m_useCustomJavaPath ? "yes" : "no");
         m_pSettings->setValue("Settings/CustomJavaPath", m_customJavaPath);
         m_pSettings->setValue("Settings/MinecraftServerPath", m_mcServerPath);
+        m_pSettings->setValue("Settings/Xms", m_xms);
+        m_pSettings->setValue("Settings/Xmx", m_xmx);
+        m_pSettings->setValue("Settings/AdditionalParameters", m_additionalParameters);
     }
 }
 
@@ -247,6 +256,9 @@ void MainWindow::on_actionSettings_triggered()
         settingsDlg->setUseCustomJavaPath(m_useCustomJavaPath);
         settingsDlg->setCustomJavaPath(m_customJavaPath);
         settingsDlg->setMinecraftServerPath(m_mcServerPath);
+        settingsDlg->setXms(m_xms);
+        settingsDlg->setXmx(m_xmx);
+        settingsDlg->setAdditionalParameters(m_additionalParameters);
 
         settingsDlg->initialize();
 
@@ -255,6 +267,9 @@ void MainWindow::on_actionSettings_triggered()
             m_mcServerPath = settingsDlg->getMinecraftServerPath();
             m_customJavaPath = settingsDlg->getCustomJavaPath();
             m_useCustomJavaPath = settingsDlg->useCustomJavaPath();
+            m_xms = settingsDlg->getXms();
+            m_xmx = settingsDlg->getXmx();
+            m_additionalParameters = settingsDlg->getAdditionalParameters();
         }
 
         delete settingsDlg;
@@ -283,7 +298,25 @@ void MainWindow::on_actionStart_triggered()
         m_pServerProcess->setWorkingDirectory(workingDir);
 
         QStringList arguments;
-        arguments << "-Xms1024M" << "-Xmx1024M" << "-jar" << mcServerFile << "nogui";
+
+        if(m_xms > 0)
+        {
+            arguments.append(QString("-Xms%1M").arg(QString::number(m_xms)));
+        }
+
+        if(m_xmx > 0)
+        {
+            arguments.append(QString("-Xmx%1M").arg(QString::number(m_xmx)));
+        }
+
+        arguments.append("-jar");
+        arguments.append(mcServerFile);
+        arguments.append("nogui");
+
+        if(!m_additionalParameters.isEmpty())
+        {
+            arguments.append(m_additionalParameters);
+        }
 
         if(m_useCustomJavaPath)
         {
