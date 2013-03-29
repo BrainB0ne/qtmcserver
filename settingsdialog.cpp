@@ -81,7 +81,7 @@ void SettingsDialog::on_javaBrowseButton_clicked()
     QString fileName = QFileDialog::getOpenFileName(this, tr("Select Java Executable"),
                                                     openDirectory,
                                                     tr("Java Executable (java.exe)"));
-#elif Q_OS_UNIX
+#elif defined Q_OS_UNIX
     if(openDirectory.isEmpty())
     {
         openDirectory = "/home";
