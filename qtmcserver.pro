@@ -86,4 +86,5 @@ OTHER_FILES += \
     images/about.png \
     images/download.png \
     images/exportlog.png \
-    images/clear.png
+    images/clear.png \
+    qtmcserver.rc
