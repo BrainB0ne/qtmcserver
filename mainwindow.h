@@ -113,6 +113,7 @@ private:
     Ui::MainWindow *ui;
 
     QLabel *statusLabel;
+    QLabel *statusLedLabel;
 
     QAction *minimizeAction;
     QAction *maximizeAction;

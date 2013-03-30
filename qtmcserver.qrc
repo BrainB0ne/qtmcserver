@@ -13,5 +13,7 @@
         <file>images/exportlog.png</file>
         <file>images/refresh.png</file>
         <file>images/save.png</file>
+        <file>images/led-green.png</file>
+        <file>images/led-red.png</file>
     </qresource>
 </RCC>

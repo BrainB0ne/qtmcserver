@@ -50,6 +50,9 @@ MainWindow::MainWindow(QWidget *parent) :
     m_xms = 512;
     m_xmx = 512;
     m_additionalParameters = "";
+
+    statusLabel = 0;
+    statusLedLabel = 0;
 }
 
 MainWindow::~MainWindow()
@@ -106,11 +109,18 @@ void MainWindow::initialize()
     createTrayIcon();
     setIcon();
 
+    statusLedLabel = new QLabel;
+    if(statusLedLabel)
+    {
+        statusBar()->addWidget(statusLedLabel);
+        statusLedLabel->setPixmap(QPixmap("://images/led-red.png"));
+    }
+
     statusLabel = new QLabel;
     if(statusLabel)
     {
         statusBar()->addWidget(statusLabel);
-        statusLabel->setText(tr("Minecraft Server Status: Stopped"));
+        statusLabel->setText(tr("Minecraft Server: Stopped"));
     }
 
     ui->actionStart->setEnabled(true);
@@ -223,8 +233,8 @@ void MainWindow::closeEvent(QCloseEvent *event)
         if(!m_bTrayWarningShowed)
         {
             QMessageBox::information(this, tr("Qt Minecraft Server"),
-                                 tr("The program will keep running in the "
-                                    "system tray. To terminate the program, "
+                                 tr("Qt Minecraft Server will keep running in the "
+                                    "system tray. To terminate Qt Minecraft Server, "
                                     "choose <b>Exit</b> in the context menu "
                                     "of the system tray entry."));
             m_bTrayWarningShowed = true;
@@ -519,7 +529,8 @@ void MainWindow::onStart()
     ui->serverPropertiesTextEdit->setEnabled(false);
     ui->actionSaveServerProperties->setEnabled(false);
 
-    statusLabel->setText(tr("Minecraft Server Status: Started"));
+    statusLabel->setText(tr("Minecraft Server: Running"));
+    statusLedLabel->setPixmap(QPixmap("://images/led-green.png"));
 }
 
 void MainWindow::onFinish(int exitCode, QProcess::ExitStatus exitStatus)
@@ -543,7 +554,8 @@ void MainWindow::onFinish(int exitCode, QProcess::ExitStatus exitStatus)
     ui->serverPropertiesTextEdit->setEnabled(true);
     ui->actionSaveServerProperties->setEnabled(true);
 
-    statusLabel->setText(tr("Minecraft Server Status: Stopped"));
+    statusLabel->setText(tr("Minecraft Server: Stopped"));
+    statusLedLabel->setPixmap(QPixmap("://images/led-red.png"));
 }
 
 void MainWindow::onStandardOutput()

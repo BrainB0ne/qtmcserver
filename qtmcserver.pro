@@ -89,4 +89,6 @@ OTHER_FILES += \
     images/clear.png \
     qtmcserver.rc \
     images/save.png \
-    images/refresh.png
+    images/refresh.png \
+    images/led-red.png \
+    images/led-green.png
