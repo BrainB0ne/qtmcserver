@@ -231,6 +231,9 @@
    <property name="text">
     <string>&amp;Export ...</string>
    </property>
+   <property name="toolTip">
+    <string>Export Console Log</string>
+   </property>
   </action>
   <action name="actionSaveServerProperties">
    <property name="icon">
