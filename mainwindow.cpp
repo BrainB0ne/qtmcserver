@@ -41,6 +41,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     m_pServerProcess = 0;
     m_pFileSystemWatcher = 0;
+    m_pDirSystemWatcher = 0;
 
     m_pSettings = 0;
     m_useCustomJavaPath = false;
@@ -53,6 +54,18 @@ MainWindow::MainWindow(QWidget *parent) :
 
 MainWindow::~MainWindow()
 {
+    if(m_pDirSystemWatcher)
+    {
+        delete m_pDirSystemWatcher;
+        m_pDirSystemWatcher = 0;
+    }
+
+    if(m_pFileSystemWatcher)
+    {
+        delete m_pFileSystemWatcher;
+        m_pFileSystemWatcher = 0;
+    }
+
     if(m_pSettings)
     {
         delete m_pSettings;
@@ -122,6 +135,9 @@ void MainWindow::initialize()
     m_pFileSystemWatcher = new QFileSystemWatcher(this);
     connect( m_pFileSystemWatcher, SIGNAL(fileChanged(QString)), SLOT(onWatchedFileChanged(QString)) );
 
+    m_pDirSystemWatcher = new QFileSystemWatcher(this);
+    connect( m_pDirSystemWatcher, SIGNAL(directoryChanged(QString)), SLOT(onWatchedDirChanged(QString)) );
+
     m_pSettings = new QSettings(QSettings::IniFormat, QSettings::UserScope, "Qt Minecraft Server", "qtmcserver", this);
 
     loadSettings();
@@ -136,6 +152,7 @@ void MainWindow::initialize()
     if(!m_mcServerPath.isEmpty())
     {
         updateWatchedFileSystemPath("", getMinecraftServerPropertiesPath(m_mcServerPath));
+        updateWatchedDirSystemPath("", getMinecraftServerWorkingDirectoryPath(m_mcServerPath));
     }
 }
 
@@ -333,6 +350,9 @@ void MainWindow::on_actionSettings_triggered()
             updateWatchedFileSystemPath( getMinecraftServerPropertiesPath(m_mcServerPath),
                                          getMinecraftServerPropertiesPath(settingsDlg->getMinecraftServerPath()));
 
+            updateWatchedDirSystemPath( getMinecraftServerWorkingDirectoryPath(m_mcServerPath),
+                                        getMinecraftServerWorkingDirectoryPath(settingsDlg->getMinecraftServerPath()));
+
             m_mcServerPath = settingsDlg->getMinecraftServerPath();
             m_customJavaPath = settingsDlg->getCustomJavaPath();
             m_useCustomJavaPath = settingsDlg->useCustomJavaPath();
@@ -363,20 +383,61 @@ QString MainWindow::getMinecraftServerPropertiesPath(const QString& mcServerPath
     return mcServerPropertiesPath;
 }
 
+QString MainWindow::getMinecraftServerWorkingDirectoryPath(const QString& mcServerPath)
+{
+    QString mcServerWorkingDirectoryPath = "";
+
+    if(!mcServerPath.isEmpty())
+    {
+        QFileInfo mcServerFileInfo = QFileInfo(mcServerPath);
+        mcServerWorkingDirectoryPath = mcServerFileInfo.absolutePath();
+    }
+
+    return mcServerWorkingDirectoryPath;
+}
+
 void MainWindow::updateWatchedFileSystemPath(const QString& oldPath, const QString& newPath)
 {
     if(m_pFileSystemWatcher)
     {
         if(!oldPath.isEmpty())
         {
-            m_pFileSystemWatcher->removePath(oldPath);
+            if(m_pFileSystemWatcher->files().contains(oldPath))
+            {
+                m_pFileSystemWatcher->removePath(oldPath);
+            }
         }
 
         if(!newPath.isEmpty())
         {
             if(QFile::exists(newPath))
             {
-                m_pFileSystemWatcher->addPath(newPath);
+                if(!m_pFileSystemWatcher->files().contains(newPath))
+                {
+                    m_pFileSystemWatcher->addPath(newPath);
+                }
+            }
+        }
+    }
+}
+
+void MainWindow::updateWatchedDirSystemPath(const QString &oldPath, const QString &newPath)
+{
+    if(m_pDirSystemWatcher)
+    {
+        if(!oldPath.isEmpty())
+        {
+            if(m_pDirSystemWatcher->directories().contains(oldPath))
+            {
+                m_pDirSystemWatcher->removePath(oldPath);
+            }
+        }
+
+        if(!newPath.isEmpty())
+        {
+            if(!m_pDirSystemWatcher->directories().contains(newPath))
+            {
+                m_pDirSystemWatcher->addPath(newPath);
             }
         }
     }
@@ -526,6 +587,22 @@ void MainWindow::onWatchedFileChanged(const QString &path)
     }
 }
 
+void MainWindow::onWatchedDirChanged(const QString &path)
+{
+    if(!m_mcServerPath.isEmpty())
+    {
+        if(path == getMinecraftServerWorkingDirectoryPath(m_mcServerPath))
+        {
+            QString mcServerPropertiesPath = getMinecraftServerPropertiesPath(m_mcServerPath);
+
+            if(QFile::exists(mcServerPropertiesPath))
+            {
+                updateWatchedFileSystemPath(mcServerPropertiesPath, mcServerPropertiesPath);
+            }
+        }
+    }
+}
+
 void MainWindow::on_actionStop_triggered()
 {
     if(m_pServerProcess)
@@ -603,11 +680,6 @@ void MainWindow::on_actionExport_triggered()
     }
 }
 
-void MainWindow::on_serverCommandLineEdit_textEdited(const QString &text)
-{
-    ui->sendCommandButton->setEnabled(!text.isEmpty());
-}
-
 void MainWindow::on_actionSaveServerProperties_triggered()
 {
     if(!m_mcServerPath.isEmpty())
@@ -634,4 +706,9 @@ void MainWindow::on_actionRefreshServerProperties_triggered()
     updateWatchedFileSystemPath(mcServerPropertiesPath, mcServerPropertiesPath);
 
     loadServerProperties();
+}
+
+void MainWindow::on_serverCommandLineEdit_textEdited(const QString &text)
+{
+    ui->sendCommandButton->setEnabled(!text.isEmpty());
 }

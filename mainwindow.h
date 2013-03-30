@@ -73,8 +73,10 @@ public:
     int getXmx() {return m_xmx;}
 
     QString getMinecraftServerPropertiesPath(const QString& mcServerPath);
+    QString getMinecraftServerWorkingDirectoryPath(const QString& mcServerPath);
 
     void updateWatchedFileSystemPath(const QString& oldPath, const QString& newPath);
+    void updateWatchedDirSystemPath(const QString& oldPath, const QString& newPath);
 
 public slots:
     void onStart();
@@ -82,6 +84,7 @@ public slots:
     void onStandardOutput();
     void onStandardError();
     void onWatchedFileChanged(const QString& path);
+    void onWatchedDirChanged(const QString& path);
 
 protected:
     void closeEvent(QCloseEvent *event);
@@ -104,7 +107,6 @@ private slots:
     void on_actionExport_triggered();
     void on_serverCommandLineEdit_textEdited(const QString &text);
     void on_actionSaveServerProperties_triggered();
-
     void on_actionRefreshServerProperties_triggered();
 
 private:
@@ -125,6 +127,7 @@ private:
     bool m_bTrayWarningShowed;
     QProcess *m_pServerProcess;
     QFileSystemWatcher* m_pFileSystemWatcher;
+    QFileSystemWatcher* m_pDirSystemWatcher;
 
     QSettings* m_pSettings;
     QString m_customJavaPath;
