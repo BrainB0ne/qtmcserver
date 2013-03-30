@@ -35,6 +35,10 @@ SettingsDialog::SettingsDialog(QWidget *parent) :
     m_xms = 512;
     m_xmx = 512;
     m_additionalParameters = "";
+
+    // temporarily hide additional parameters
+    ui->additionalParametersLabel->hide();
+    ui->additionalParametersLineEdit->hide();
 }
 
 SettingsDialog::~SettingsDialog()
@@ -58,6 +62,8 @@ void SettingsDialog::on_downloadButton_clicked()
 
     if(downloadDlg)
     {
+        downloadDlg->initialize();
+
         if(downloadDlg->exec() == QDialog::Accepted)
         {
             QString saveLocation = downloadDlg->getSaveLocation();
