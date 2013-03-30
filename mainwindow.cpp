@@ -61,9 +61,29 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-QString MainWindow::htmlBold(const QString &msg)
+QString MainWindow::htmlColor(const QString &msg, const QString &color)
 {
-    return QString("<b>%1</b>").arg(msg);
+    return QString("<font color=\"%1\">%2</font>").arg(color).arg(msg);
+}
+
+QString MainWindow::htmlBlue(const QString &msg)
+{
+    return htmlColor(msg, "blue");
+}
+
+QString MainWindow::htmlRed(const QString &msg)
+{
+    return htmlColor(msg, "red");
+}
+
+QString MainWindow::htmlGreen(const QString &msg)
+{
+    return htmlColor(msg, "green");
+}
+
+QString MainWindow::htmlPurple(const QString &msg)
+{
+    return htmlColor(msg, "purple");
 }
 
 void MainWindow::initialize()
@@ -326,32 +346,32 @@ void MainWindow::on_actionStart_triggered()
             arguments.append(m_additionalParameters);
         }
 
-        ui->serverLogTextEdit->append(htmlBold(tr("&gt;&gt; Starting Java VM in Working Directory: %1...")
+        ui->serverLogTextEdit->append(htmlBlue(tr("&gt;&gt; Starting Java VM in Working Directory: %1...")
                                                .arg(QDir::toNativeSeparators(workingDir))));
 
         if(m_useCustomJavaPath)
         {
-            ui->serverLogTextEdit->append(htmlBold(tr("&gt;&gt; %1 %2").arg(QDir::toNativeSeparators(m_customJavaPath))
+            ui->serverLogTextEdit->append(htmlBlue(tr("&gt;&gt; %1 %2").arg(QDir::toNativeSeparators(m_customJavaPath))
                                                    .arg(arguments.join(" "))));
 
             m_pServerProcess->start(m_customJavaPath, arguments, QIODevice::ReadWrite | QIODevice::Unbuffered);
         }
         else
         {
-            ui->serverLogTextEdit->append(htmlBold(tr("&gt;&gt; java %1").arg(arguments.join(" "))));
+            ui->serverLogTextEdit->append(htmlBlue(tr("&gt;&gt; java %1").arg(arguments.join(" "))));
             m_pServerProcess->start("java", arguments, QIODevice::ReadWrite | QIODevice::Unbuffered);
         }
 
         if(!m_pServerProcess->waitForStarted())
         {
-            ui->serverLogTextEdit->append(htmlBold(tr("&gt;&gt; Unable to start Java VM.")));
+            ui->serverLogTextEdit->append(htmlBlue(tr("&gt;&gt; Unable to start Java VM.")));
         }
     }
 }
 
 void MainWindow::onStart()
 {
-    ui->serverLogTextEdit->append(htmlBold(tr("&gt;&gt; Starting Minecraft Server...")));
+    ui->serverLogTextEdit->append(htmlBlue(tr("&gt;&gt; Starting Minecraft Server...")));
 
     ui->actionStart->setEnabled(false);
     ui->actionStop->setEnabled(true);
@@ -365,11 +385,11 @@ void MainWindow::onFinish(int exitCode, QProcess::ExitStatus exitStatus)
 {
     if(exitStatus == QProcess::NormalExit)
     {
-        ui->serverLogTextEdit->append(htmlBold(tr("&gt;&gt; Minecraft Server stopped normally with exit code: %1").arg(exitCode)));
+        ui->serverLogTextEdit->append(htmlBlue(tr("&gt;&gt; Minecraft Server stopped normally with exit code: %1").arg(exitCode)));
     }
     else if(exitStatus == QProcess::CrashExit)
     {
-        ui->serverLogTextEdit->append(htmlBold(tr("&gt;&gt; Minecraft Server exited abnormally")));
+        ui->serverLogTextEdit->append(htmlBlue(tr("&gt;&gt; Minecraft Server exited abnormally")));
     }
 
     ui->actionStart->setEnabled(true);
@@ -414,11 +434,13 @@ void MainWindow::on_actionStop_triggered()
     {
         if(m_pServerProcess->state() == QProcess::Running)
         {
-            ui->serverLogTextEdit->append(htmlBold(tr("&gt;&gt; Stopping Minecraft Server...")));
+            ui->serverLogTextEdit->append(htmlBlue(tr("&gt;&gt; Stopping Minecraft Server...")));
 
             if(m_pServerProcess->isWritable())
             {
-                m_pServerProcess->write("stop\n");
+                QByteArray command = (QString("stop") + QString("\n")).toAscii();
+
+                m_pServerProcess->write(command);
                 m_pServerProcess->waitForBytesWritten();
             }
         }
@@ -436,11 +458,11 @@ void MainWindow::on_sendCommandButton_clicked()
         {
             if(m_pServerProcess->isWritable())
             {
-                ui->serverLogTextEdit->append(htmlBold(QString("&lt;&lt; ") + ui->serverCommandLineEdit->text()));
+                ui->serverLogTextEdit->append(htmlGreen(QString("&lt;&lt; ") + ui->serverCommandLineEdit->text()));
 
                 if(ui->serverCommandLineEdit->text().trimmed() == "stop")
                 {
-                    ui->serverLogTextEdit->append(htmlBold(tr("&gt;&gt; Stopping Minecraft Server...")));
+                    ui->serverLogTextEdit->append(htmlBlue(tr("&gt;&gt; Stopping Minecraft Server...")));
                 }
 
                 QByteArray command = (ui->serverCommandLineEdit->text() + QString("\n")).toAscii();

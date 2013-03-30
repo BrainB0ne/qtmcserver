@@ -45,7 +45,11 @@ public:
     void loadSettings();
     void saveSettings();
 
-    QString htmlBold(const QString& msg);
+    QString htmlColor(const QString& msg, const QString& color);
+    QString htmlBlue(const QString& msg);
+    QString htmlRed(const QString& msg);
+    QString htmlGreen(const QString& msg);
+    QString htmlPurple(const QString& msg);
 
     void setMinecraftServerPath(const QString& mcServerPath) {m_mcServerPath = mcServerPath;}
     QString getMinecraftServerPath() {return m_mcServerPath;}
