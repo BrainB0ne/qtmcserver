@@ -24,6 +24,7 @@
 #include <QMenu>
 #include <QCloseEvent>
 #include <QProcess>
+#include <QFileSystemWatcher>
 #include <QSettings>
 #include <QLabel>
 
@@ -71,11 +72,16 @@ public:
     void setXmx(int xmx) {m_xmx = xmx;}
     int getXmx() {return m_xmx;}
 
+    QString getMinecraftServerPropertiesPath(const QString& mcServerPath);
+
+    void updateWatchedFileSystemPath(const QString& oldPath, const QString& newPath);
+
 public slots:
     void onStart();
     void onFinish(int exitCode, QProcess::ExitStatus exitStatus);
     void onStandardOutput();
     void onStandardError();
+    void onWatchedFileChanged(const QString& path);
 
 protected:
     void closeEvent(QCloseEvent *event);
@@ -97,7 +103,6 @@ private slots:
     void on_actionClear_triggered();
     void on_actionExport_triggered();
     void on_serverCommandLineEdit_textEdited(const QString &text);
-
     void on_actionSaveServerProperties_triggered();
 
     void on_actionRefreshServerProperties_triggered();
@@ -119,6 +124,7 @@ private:
 
     bool m_bTrayWarningShowed;
     QProcess *m_pServerProcess;
+    QFileSystemWatcher* m_pFileSystemWatcher;
 
     QSettings* m_pSettings;
     QString m_customJavaPath;

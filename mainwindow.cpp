@@ -40,6 +40,7 @@ MainWindow::MainWindow(QWidget *parent) :
     trayIconMenu = 0;
 
     m_pServerProcess = 0;
+    m_pFileSystemWatcher = 0;
 
     m_pSettings = 0;
     m_useCustomJavaPath = false;
@@ -118,6 +119,9 @@ void MainWindow::initialize()
     connect( m_pServerProcess, SIGNAL(readyReadStandardOutput()), SLOT(onStandardOutput()) );
     connect( m_pServerProcess, SIGNAL(readyReadStandardError()), SLOT(onStandardError()) );
 
+    m_pFileSystemWatcher = new QFileSystemWatcher(this);
+    connect( m_pFileSystemWatcher, SIGNAL(fileChanged(QString)), SLOT(onWatchedFileChanged(QString)) );
+
     m_pSettings = new QSettings(QSettings::IniFormat, QSettings::UserScope, "Qt Minecraft Server", "qtmcserver", this);
 
     loadSettings();
@@ -128,6 +132,11 @@ void MainWindow::initialize()
     }
 
     loadServerProperties();
+
+    if(!m_mcServerPath.isEmpty())
+    {
+        updateWatchedFileSystemPath("", getMinecraftServerPropertiesPath(m_mcServerPath));
+    }
 }
 
 void MainWindow::closeApplication()
@@ -173,18 +182,13 @@ void MainWindow::loadServerProperties()
             ui->actionSaveServerProperties->setEnabled(true);
         }
 
-        QFileInfo mcServerFileInfo = QFileInfo(m_mcServerPath);
-        QString workingDir = mcServerFileInfo.absolutePath();
+        ui->serverPropertiesTextEdit->clear();
 
-        QString serverPropertiesFile = workingDir + QString("/server.properties");
-
-        QFile file(serverPropertiesFile);
+        QFile file(getMinecraftServerPropertiesPath(m_mcServerPath));
         if(!file.open(QIODevice::ReadOnly))
         {
             return;
         }
-
-        ui->serverPropertiesTextEdit->clear();
 
         QTextStream in(&file);
 
@@ -326,16 +330,55 @@ void MainWindow::on_actionSettings_triggered()
 
         if(settingsDlg->exec() == QDialog::Accepted)
         {
+            updateWatchedFileSystemPath( getMinecraftServerPropertiesPath(m_mcServerPath),
+                                         getMinecraftServerPropertiesPath(settingsDlg->getMinecraftServerPath()));
+
             m_mcServerPath = settingsDlg->getMinecraftServerPath();
             m_customJavaPath = settingsDlg->getCustomJavaPath();
             m_useCustomJavaPath = settingsDlg->useCustomJavaPath();
             m_xms = settingsDlg->getXms();
             m_xmx = settingsDlg->getXmx();
             m_additionalParameters = settingsDlg->getAdditionalParameters();
+
+            loadServerProperties();
         }
 
         delete settingsDlg;
         settingsDlg = 0;
+    }
+}
+
+QString MainWindow::getMinecraftServerPropertiesPath(const QString& mcServerPath)
+{
+    QString mcServerPropertiesPath = "";
+
+    if(!mcServerPath.isEmpty())
+    {
+        QFileInfo mcServerFileInfo = QFileInfo(mcServerPath);
+        QString workingDir = mcServerFileInfo.absolutePath();
+
+        mcServerPropertiesPath = workingDir + QString("/server.properties");
+    }
+
+    return mcServerPropertiesPath;
+}
+
+void MainWindow::updateWatchedFileSystemPath(const QString& oldPath, const QString& newPath)
+{
+    if(m_pFileSystemWatcher)
+    {
+        if(!oldPath.isEmpty())
+        {
+            m_pFileSystemWatcher->removePath(oldPath);
+        }
+
+        if(!newPath.isEmpty())
+        {
+            if(QFile::exists(newPath))
+            {
+                m_pFileSystemWatcher->addPath(newPath);
+            }
+        }
     }
 }
 
@@ -467,12 +510,18 @@ void MainWindow::onStandardError()
 
         if(!str.isEmpty())
         {
-            if(str.contains("[INFO] Done"))
-            {
-                loadServerProperties();
-            }
-
             ui->serverLogTextEdit->append(str);
+        }
+    }
+}
+
+void MainWindow::onWatchedFileChanged(const QString &path)
+{
+    if(!m_mcServerPath.isEmpty())
+    {
+        if(path == getMinecraftServerPropertiesPath(m_mcServerPath))
+        {
+            loadServerProperties();
         }
     }
 }
@@ -581,5 +630,8 @@ void MainWindow::on_actionSaveServerProperties_triggered()
 
 void MainWindow::on_actionRefreshServerProperties_triggered()
 {
+    QString mcServerPropertiesPath = getMinecraftServerPropertiesPath(m_mcServerPath);
+    updateWatchedFileSystemPath(mcServerPropertiesPath, mcServerPropertiesPath);
+
     loadServerProperties();
 }
