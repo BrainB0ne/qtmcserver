@@ -27,7 +27,7 @@
       <item row="0" column="0" colspan="4">
        <widget class="QRadioButton" name="environmentRadioButton">
         <property name="text">
-         <string>Use Environment Settings (Default)</string>
+         <string>Use Environment Settings</string>
         </property>
         <property name="checked">
          <bool>true</bool>
@@ -70,7 +70,7 @@
          </sizepolicy>
         </property>
         <property name="text">
-         <string>Mininum Heap Size (Xms):</string>
+         <string>Min. Heap Size (Xms):</string>
         </property>
        </widget>
       </item>
@@ -112,7 +112,7 @@
          </sizepolicy>
         </property>
         <property name="text">
-         <string>Maximum Heap Size (Xmx):</string>
+         <string>Max. Heap Size (Xmx):</string>
         </property>
        </widget>
       </item>
