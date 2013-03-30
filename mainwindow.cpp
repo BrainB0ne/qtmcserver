@@ -72,6 +72,13 @@ void MainWindow::initialize()
     createTrayIcon();
     setIcon();
 
+    statusLabel = new QLabel;
+    if(statusLabel)
+    {
+        statusBar()->addWidget(statusLabel);
+        statusLabel->setText(tr("Minecraft Server Status: Stopped"));
+    }
+
     ui->actionStart->setEnabled(true);
     ui->actionStop->setEnabled(false);
     ui->actionSettings->setEnabled(true);
@@ -187,6 +194,7 @@ void MainWindow::createTrayIcon()
 
         if(trayIcon)
         {
+            trayIcon->setToolTip("Qt Minecraft Server");
             trayIcon->setContextMenu(trayIconMenu);
         }
     }
@@ -318,44 +326,58 @@ void MainWindow::on_actionStart_triggered()
             arguments.append(m_additionalParameters);
         }
 
+        ui->serverLogTextEdit->append(htmlBold(tr("&gt;&gt; Starting Java VM in Working Directory: %1...")
+                                               .arg(QDir::toNativeSeparators(workingDir))));
+
         if(m_useCustomJavaPath)
         {
+            ui->serverLogTextEdit->append(htmlBold(tr("&gt;&gt; %1 %2").arg(QDir::toNativeSeparators(m_customJavaPath))
+                                                   .arg(arguments.join(" "))));
+
             m_pServerProcess->start(m_customJavaPath, arguments, QIODevice::ReadWrite | QIODevice::Unbuffered);
         }
         else
         {
+            ui->serverLogTextEdit->append(htmlBold(tr("&gt;&gt; java %1").arg(arguments.join(" "))));
             m_pServerProcess->start("java", arguments, QIODevice::ReadWrite | QIODevice::Unbuffered);
         }
 
-        m_pServerProcess->waitForStarted();
+        if(!m_pServerProcess->waitForStarted())
+        {
+            ui->serverLogTextEdit->append(htmlBold(tr("&gt;&gt; Unable to start Java VM.")));
+        }
     }
 }
 
 void MainWindow::onStart()
 {
-    ui->serverLogTextEdit->append(htmlBold(tr("Starting Minecraft Server...")));
+    ui->serverLogTextEdit->append(htmlBold(tr("&gt;&gt; Starting Minecraft Server...")));
 
     ui->actionStart->setEnabled(false);
     ui->actionStop->setEnabled(true);
     ui->actionSettings->setEnabled(false);
     ui->serverPropertiesTextEdit->setEnabled(false);
+
+    statusLabel->setText(tr("Minecraft Server Status: Started"));
 }
 
 void MainWindow::onFinish(int exitCode, QProcess::ExitStatus exitStatus)
 {
     if(exitStatus == QProcess::NormalExit)
     {
-        ui->serverLogTextEdit->append(htmlBold(tr("Minecraft Server closed normally with exit code: %1").arg(exitCode)));
+        ui->serverLogTextEdit->append(htmlBold(tr("&gt;&gt; Minecraft Server stopped normally with exit code: %1").arg(exitCode)));
     }
     else if(exitStatus == QProcess::CrashExit)
     {
-        ui->serverLogTextEdit->append(htmlBold(tr("Minecraft Server exited abnormally")));
+        ui->serverLogTextEdit->append(htmlBold(tr("&gt;&gt; Minecraft Server exited abnormally")));
     }
 
     ui->actionStart->setEnabled(true);
     ui->actionStop->setEnabled(false);
     ui->actionSettings->setEnabled(true);
     ui->serverPropertiesTextEdit->setEnabled(true);
+
+    statusLabel->setText(tr("Minecraft Server Status: Stopped"));
 }
 
 void MainWindow::onStandardOutput()
@@ -392,6 +414,8 @@ void MainWindow::on_actionStop_triggered()
     {
         if(m_pServerProcess->state() == QProcess::Running)
         {
+            ui->serverLogTextEdit->append(htmlBold(tr("&gt;&gt; Stopping Minecraft Server...")));
+
             if(m_pServerProcess->isWritable())
             {
                 m_pServerProcess->write("stop\n");
@@ -412,7 +436,12 @@ void MainWindow::on_sendCommandButton_clicked()
         {
             if(m_pServerProcess->isWritable())
             {
-                ui->serverLogTextEdit->append(htmlBold(QString(">> ") + ui->serverCommandLineEdit->text()));
+                ui->serverLogTextEdit->append(htmlBold(QString("&lt;&lt; ") + ui->serverCommandLineEdit->text()));
+
+                if(ui->serverCommandLineEdit->text().trimmed() == "stop")
+                {
+                    ui->serverLogTextEdit->append(htmlBold(tr("&gt;&gt; Stopping Minecraft Server...")));
+                }
 
                 QByteArray command = (ui->serverCommandLineEdit->text() + QString("\n")).toAscii();
 

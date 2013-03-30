@@ -25,6 +25,7 @@
 #include <QCloseEvent>
 #include <QProcess>
 #include <QSettings>
+#include <QLabel>
 
 namespace Ui {
 class MainWindow;
@@ -93,6 +94,8 @@ private slots:
 
 private:
     Ui::MainWindow *ui;
+
+    QLabel *statusLabel;
 
     QAction *minimizeAction;
     QAction *maximizeAction;
