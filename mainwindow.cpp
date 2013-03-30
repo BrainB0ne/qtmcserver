@@ -364,7 +364,7 @@ void MainWindow::on_actionStart_triggered()
 
         if(!m_pServerProcess->waitForStarted())
         {
-            ui->serverLogTextEdit->append(htmlBlue(tr("&gt;&gt; Unable to start Java VM.")));
+            ui->serverLogTextEdit->append(htmlRed(tr("&gt;&gt; Unable to start Java VM.")));
         }
     }
 }
@@ -383,13 +383,17 @@ void MainWindow::onStart()
 
 void MainWindow::onFinish(int exitCode, QProcess::ExitStatus exitStatus)
 {
-    if(exitStatus == QProcess::NormalExit)
+    if((exitStatus == QProcess::NormalExit) && (exitCode ==  0))
     {
         ui->serverLogTextEdit->append(htmlBlue(tr("&gt;&gt; Minecraft Server stopped normally with exit code: %1").arg(exitCode)));
     }
+    else if((exitStatus == QProcess::NormalExit) && (exitCode ==  1))
+    {
+        ui->serverLogTextEdit->append(htmlRed(tr("&gt;&gt; Minecraft Server killed and exited with exit code: %1").arg(exitCode)));
+    }
     else if(exitStatus == QProcess::CrashExit)
     {
-        ui->serverLogTextEdit->append(htmlBlue(tr("&gt;&gt; Minecraft Server exited abnormally")));
+        ui->serverLogTextEdit->append(htmlRed(tr("&gt;&gt; Minecraft Server crashed!")));
     }
 
     ui->actionStart->setEnabled(true);
