@@ -168,6 +168,11 @@ void MainWindow::loadServerProperties()
 {
     if(!m_mcServerPath.isEmpty())
     {
+        if(m_pServerProcess && (m_pServerProcess->state() == QProcess::NotRunning))
+        {
+            ui->actionSaveServerProperties->setEnabled(true);
+        }
+
         QFileInfo mcServerFileInfo = QFileInfo(m_mcServerPath);
         QString workingDir = mcServerFileInfo.absolutePath();
 
@@ -185,11 +190,6 @@ void MainWindow::loadServerProperties()
 
         QString contents = in.readAll();
         ui->serverPropertiesTextEdit->setText(contents);
-
-        if(file.exists() && m_pServerProcess && (m_pServerProcess->state() == QProcess::NotRunning))
-        {
-            ui->actionSaveServerProperties->setEnabled(true);
-        }
 
         file.close();
     }
@@ -380,6 +380,8 @@ void MainWindow::on_actionStart_triggered()
             arguments.append(m_additionalParameters);
         }
 
+        on_actionSaveServerProperties_triggered();
+
         ui->serverLogTextEdit->append(htmlBlue(tr("&gt;&gt; Starting Java VM in Working Directory: %1...")
                                                .arg(QDir::toNativeSeparators(workingDir))));
 
@@ -464,7 +466,14 @@ void MainWindow::onStandardError()
         str = QString(baError).trimmed();
 
         if(!str.isEmpty())
+        {
+            if(str.contains("[INFO] Done"))
+            {
+                loadServerProperties();
+            }
+
             ui->serverLogTextEdit->append(str);
+        }
     }
 }
 
