@@ -45,6 +45,8 @@ public:
     void loadSettings();
     void saveSettings();
 
+    void loadServerProperties();
+
     QString htmlColor(const QString& msg, const QString& color);
     QString htmlBlue(const QString& msg);
     QString htmlRed(const QString& msg);
@@ -95,6 +97,10 @@ private slots:
     void on_actionClear_triggered();
     void on_actionExport_triggered();
     void on_serverCommandLineEdit_textEdited(const QString &text);
+
+    void on_actionSaveServerProperties_triggered();
+
+    void on_actionRefreshServerProperties_triggered();
 
 private:
     Ui::MainWindow *ui;

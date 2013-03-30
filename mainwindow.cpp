@@ -104,6 +104,7 @@ void MainWindow::initialize()
     ui->actionSettings->setEnabled(true);
     ui->serverPropertiesTextEdit->setEnabled(true);
     ui->sendCommandButton->setEnabled(false);
+    ui->actionSaveServerProperties->setEnabled(false);
 
     if(trayIcon)
     {
@@ -125,6 +126,8 @@ void MainWindow::initialize()
     {
         on_actionSettings_triggered();
     }
+
+    loadServerProperties();
 }
 
 void MainWindow::closeApplication()
@@ -158,6 +161,37 @@ void MainWindow::saveSettings()
         m_pSettings->setValue("Settings/Xms", m_xms);
         m_pSettings->setValue("Settings/Xmx", m_xmx);
         m_pSettings->setValue("Settings/AdditionalParameters", m_additionalParameters);
+    }
+}
+
+void MainWindow::loadServerProperties()
+{
+    if(!m_mcServerPath.isEmpty())
+    {
+        QFileInfo mcServerFileInfo = QFileInfo(m_mcServerPath);
+        QString workingDir = mcServerFileInfo.absolutePath();
+
+        QString serverPropertiesFile = workingDir + QString("/server.properties");
+
+        QFile file(serverPropertiesFile);
+        if(!file.open(QIODevice::ReadOnly))
+        {
+            return;
+        }
+
+        ui->serverPropertiesTextEdit->clear();
+
+        QTextStream in(&file);
+
+        QString contents = in.readAll();
+        ui->serverPropertiesTextEdit->setText(contents);
+
+        if(file.exists() && m_pServerProcess && (m_pServerProcess->state() == QProcess::NotRunning))
+        {
+            ui->actionSaveServerProperties->setEnabled(true);
+        }
+
+        file.close();
     }
 }
 
@@ -377,6 +411,7 @@ void MainWindow::onStart()
     ui->actionStop->setEnabled(true);
     ui->actionSettings->setEnabled(false);
     ui->serverPropertiesTextEdit->setEnabled(false);
+    ui->actionSaveServerProperties->setEnabled(false);
 
     statusLabel->setText(tr("Minecraft Server Status: Started"));
 }
@@ -400,6 +435,7 @@ void MainWindow::onFinish(int exitCode, QProcess::ExitStatus exitStatus)
     ui->actionStop->setEnabled(false);
     ui->actionSettings->setEnabled(true);
     ui->serverPropertiesTextEdit->setEnabled(true);
+    ui->actionSaveServerProperties->setEnabled(true);
 
     statusLabel->setText(tr("Minecraft Server Status: Stopped"));
 }
@@ -512,4 +548,29 @@ void MainWindow::on_actionExport_triggered()
 void MainWindow::on_serverCommandLineEdit_textEdited(const QString &text)
 {
     ui->sendCommandButton->setEnabled(!text.isEmpty());
+}
+
+void MainWindow::on_actionSaveServerProperties_triggered()
+{
+    if(!m_mcServerPath.isEmpty())
+    {
+        QFileInfo mcServerFileInfo = QFileInfo(m_mcServerPath);
+        QString workingDir = mcServerFileInfo.absolutePath();
+
+        QFile outfile;
+        outfile.setFileName(workingDir + QString("/server.properties"));
+
+        if(outfile.open(QIODevice::WriteOnly | QIODevice::Text))
+        {
+            QTextStream out(&outfile);
+            out << ui->serverPropertiesTextEdit->toPlainText();
+
+            outfile.close();
+        }
+    }
+}
+
+void MainWindow::on_actionRefreshServerProperties_triggered()
+{
+    loadServerProperties();
 }

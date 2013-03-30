@@ -64,7 +64,14 @@
        </attribute>
        <layout class="QGridLayout" name="gridLayout_3">
         <item row="0" column="0">
-         <widget class="QTextEdit" name="serverPropertiesTextEdit"/>
+         <widget class="QTextEdit" name="serverPropertiesTextEdit">
+          <property name="font">
+           <font>
+            <family>Lucida Console</family>
+            <pointsize>9</pointsize>
+           </font>
+          </property>
+         </widget>
         </item>
        </layout>
       </widget>
@@ -99,8 +106,17 @@
     <property name="title">
      <string>&amp;Server</string>
     </property>
+    <widget class="QMenu" name="menu_Properties">
+     <property name="title">
+      <string>&amp;Properties</string>
+     </property>
+     <addaction name="actionSaveServerProperties"/>
+     <addaction name="actionRefreshServerProperties"/>
+    </widget>
     <addaction name="actionStart"/>
     <addaction name="actionStop"/>
+    <addaction name="separator"/>
+    <addaction name="menu_Properties"/>
    </widget>
    <widget class="QMenu" name="menu_Log">
     <property name="title">
@@ -125,6 +141,9 @@
    <addaction name="separator"/>
    <addaction name="actionStart"/>
    <addaction name="actionStop"/>
+   <addaction name="separator"/>
+   <addaction name="actionRefreshServerProperties"/>
+   <addaction name="actionSaveServerProperties"/>
    <addaction name="separator"/>
    <addaction name="actionClear"/>
    <addaction name="actionExport"/>
@@ -211,6 +230,30 @@
    </property>
    <property name="text">
     <string>&amp;Export ...</string>
+   </property>
+  </action>
+  <action name="actionSaveServerProperties">
+   <property name="icon">
+    <iconset resource="qtmcserver.qrc">
+     <normaloff>:/images/save.png</normaloff>:/images/save.png</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;Save</string>
+   </property>
+   <property name="toolTip">
+    <string>Save Server Properies</string>
+   </property>
+  </action>
+  <action name="actionRefreshServerProperties">
+   <property name="icon">
+    <iconset resource="qtmcserver.qrc">
+     <normaloff>:/images/refresh.png</normaloff>:/images/refresh.png</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;Refresh</string>
+   </property>
+   <property name="toolTip">
+    <string>Refresh Server Properties</string>
    </property>
   </action>
  </widget>
