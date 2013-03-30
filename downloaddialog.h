@@ -49,6 +49,8 @@ public:
     explicit DownloadDialog(QWidget *parent = 0);
     ~DownloadDialog();
 
+    void initialize();
+
     QString getSaveLocation() {return m_saveLocation;}
 
     void doDownload(const QUrl& url);

@@ -40,6 +40,12 @@ DownloadDialog::~DownloadDialog()
     delete ui;
 }
 
+void DownloadDialog::initialize()
+{
+    ui->downloadButton->setToolTip(tr("Click here to download the official Minecraft Server\nA connection will be made to %1")
+                                   .arg(MCSERVER_URL));
+}
+
 void DownloadDialog::on_downloadButton_clicked()
 {
     QString openDirectory = "";
