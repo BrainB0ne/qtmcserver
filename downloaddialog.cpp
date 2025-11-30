@@ -21,7 +21,8 @@
 #include <QFileDialog>
 #include <QMessageBox>
 
-#define MCSERVER_URL "http://s3.amazonaws.com/MinecraftDownload/launcher/minecraft_server.jar"
+#define MCSERVER_URL     "http://s3.amazonaws.com/MinecraftDownload/launcher/minecraft_server.jar"
+#define MCSERVER_URL_NEW "http://piston-data.mojang.com/v1/objects/95495a7f485eedd84ce928cef5e223b757d2f764/server.jar"
 
 DownloadDialog::DownloadDialog(QWidget *parent) :
     QDialog(parent),
@@ -43,7 +44,7 @@ DownloadDialog::~DownloadDialog()
 void DownloadDialog::initialize()
 {
     ui->downloadButton->setToolTip(tr("Click here to download the official Minecraft Server\nA connection will be made to %1")
-                                   .arg(MCSERVER_URL));
+                                   .arg(MCSERVER_URL_NEW));
 }
 
 void DownloadDialog::on_downloadButton_clicked()
@@ -81,10 +82,10 @@ void DownloadDialog::startDownload()
 {
     QApplication::setOverrideCursor(Qt::WaitCursor);
 
-    ui->downloadLogTextEdit->append(tr("Connecting to %1").arg(MCSERVER_URL));
+    ui->downloadLogTextEdit->append(tr("Connecting to %1").arg(MCSERVER_URL_NEW));
     ui->downloadLogTextEdit->append(tr("Downloading Minecraft Server... Please wait..."));
 
-    doDownload( QUrl(MCSERVER_URL) );
+    doDownload( QUrl(MCSERVER_URL_NEW) );
 }
 
 void DownloadDialog::doDownload(const QUrl& url)
