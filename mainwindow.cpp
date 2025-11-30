@@ -625,7 +625,7 @@ void MainWindow::on_actionStop_triggered()
 
             if(m_pServerProcess->isWritable())
             {
-                QByteArray command = (QString("stop") + QString("\n")).toAscii();
+                QByteArray command = (QString("stop") + QString("\n")).toLatin1();
 
                 m_pServerProcess->write(command);
                 m_pServerProcess->waitForBytesWritten();
@@ -652,7 +652,7 @@ void MainWindow::on_sendCommandButton_clicked()
                     ui->serverLogTextEdit->append(htmlBlue(tr("&gt;&gt; Stopping Minecraft Server...")));
                 }
 
-                QByteArray command = (ui->serverCommandLineEdit->text() + QString("\n")).toAscii();
+                QByteArray command = (ui->serverCommandLineEdit->text() + QString("\n")).toLatin1();
 
                 m_pServerProcess->write(command);
                 m_pServerProcess->waitForBytesWritten();
@@ -686,7 +686,7 @@ void MainWindow::on_actionExport_triggered()
         if(outfile.open(QIODevice::WriteOnly | QIODevice::Text))
         {
             QTextStream out(&outfile);
-            out << ui->serverLogTextEdit->toPlainText() << endl;
+            out << ui->serverLogTextEdit->toPlainText() << Qt::endl;
             outfile.close();
         }
     }
